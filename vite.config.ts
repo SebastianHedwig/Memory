@@ -18,11 +18,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        loadPaths: [scssPath],
-        additionalData: `
-          @use "abstracts/variables" as *;
-          @use "abstracts/mixins" as *;
-        `
+        loadPaths: [scssPath]
       }
     }
   },

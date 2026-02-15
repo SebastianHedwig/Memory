@@ -3,10 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./src/assets/favicon.png" type="image/x-icon">
     <title>Memory</title>
-    <script type="module" src="./src/main.ts"></script>
+    <script type="module" src="./src/home.ts"></script>
 </head>
 <body>
-    <h1 id="title"></h1>
+    <div class="title-box">
+        <span class="subtitle"></span>
+        <h1 class="title"></h1>
+    </div>
+    <button class="button button--primary">
+        <img class="button__controller-icon" src="./src/assets/icons/controller.png" alt="controller icon">
+        <span id="play-btn">Play</span>
+        <img class="button__arrow-icon" src="./src/assets/icons/arrow-right.png" alt="arrow-right icon">
+    </button>
+    <div class="controller-watermark" aria-hidden="true"></div>
 </body>
 </html>
