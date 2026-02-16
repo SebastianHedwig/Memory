@@ -1,0 +1,263 @@
+@use "../abstracts" as *;
+@use "../base/typography" as *;
+
+$settings-bg: rgb(255, 255, 255);
+$settings-text: rgb(48, 49, 49);
+$settings-steps-bg: rgb(246, 246, 246);
+
+.settings {
+  background-color: $settings-bg;
+  color: $settings-text;
+  font-family: "Almarai", sans-serif;
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: clamp(2rem, 6vw, 5rem) 0 2rem;
+
+  &__layout {
+    width: min(72rem, 100% - 3rem);
+    margin: 0 auto;
+    display: block;
+  }
+
+  &__header {
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  &__title {
+    font-family: "Red Rose", serif;
+    font-size: clamp(2.35rem, 4.3vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  &__title-underline {
+    width: 16rem;
+    position: relative;
+    left: -1.5rem;
+    top: -0.4rem;
+  }
+
+  &__panel,
+  &__preview {
+    flex: 1 1 50%;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0.9rem;
+    padding: clamp(1rem, 2.2vw, 1.5rem);
+  }
+
+  &__content {
+    display: flex;
+    gap: clamp(1rem, 2.5vw, 3rem);
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  &__form {
+    @include flex-stack(clamp(2rem, 6vw, 6rem));
+  }
+
+  &__group {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__group-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Red Rose", serif;
+    font-size: clamp(1.65rem, 2.5vw, 2.1rem);
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+  }
+
+  &__group-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &__options {
+    @include flex-stack(1rem);
+    padding-left: 0.2rem;
+  }
+
+  &__option {
+    position: relative;
+
+    &:hover .settings__option-radio::after {
+      @include radio-dot(0.4rem, $settings-text);
+    }
+
+    &:hover .settings__option-text {
+      font-weight: 700;
+    }
+  }
+
+  &__option-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+
+    &:checked + .settings__option-label .settings__option-radio::after {
+      @include radio-dot(0.4rem, $settings-text);
+    }
+
+    &:checked + .settings__option-label .settings__option-text {
+      font-weight: 700;
+    }
+
+    &:checked + .settings__option-label .settings__option-line {
+      display: block;
+    }
+
+    &:focus-visible + .settings__option-label .settings__option-radio {
+      outline: 0.13rem solid $settings-text;
+      outline-offset: 0.15rem;
+    }
+  }
+
+  &__option-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.62rem;
+    min-height: 1.75rem;
+  }
+
+  &__option-radio {
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 0.13rem solid $settings-text;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__option-text {
+    font-size: clamp(1.3rem, 2vw, 1.78rem);
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  &__option-line {
+    display: none;
+    width: 3rem;
+    height: 1.7rem;
+    background: url("../../assets/icons/settingsIcons/option-line.png") no-repeat center / contain;
+    margin-left: 0.1rem;
+  }
+
+  &__preview {
+    @include flex-stack(clamp(2rem, 6vw, 6rem));
+  }
+
+  &__steps-mount {
+    align-self: flex-end;
+    padding: 0.8rem 1rem;
+    width: fit-content;
+    background-color: $settings-steps-bg;
+  }
+
+  &__preview-card img  {
+    width: 100%;
+    border-radius: 1.1rem;
+    box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.12);
+  }
+
+  &__steps {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0 0.5rem;
+    min-height: 4.5rem;
+    width: max-content;
+  }
+
+  &__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1rem, 1.7vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.1;
+    white-space: nowrap;
+    text-align: center;
+
+    &:nth-of-type(1) {
+      min-width: 8rem;
+    }
+
+    &:nth-of-type(2) {
+      min-width: 4.8rem;
+    }
+
+    &:nth-of-type(3) {
+      min-width: 6.6rem;
+    }
+
+    &--active {
+      font-weight: 700;
+    }
+  }
+
+  &__separator {
+    display: block;
+    flex: 0 0 auto;
+    object-fit: contain;
+    object-position: center;
+    width: 2.5rem;
+    height: 4.5rem;
+  }
+
+  &__start-button {
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    width: fit-content;
+    transform-origin: center center;
+
+    &:not(:disabled) {
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+      transform: scale(1.02);
+    }
+
+    &:not(:disabled):hover {
+      transform: scale(1.1);
+    }
+
+    &:not(:disabled):active {
+      transform: scale(1.02);
+    }
+
+    &:not(:disabled):hover .settings__start-icon {
+      transform: rotate(-22deg) scale(1.3);
+    }
+  }
+
+  &__start-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    transition: transform 0.2s ease;
+  }
+}
+
+@media (max-width: 64rem) {
+  .settings__content {
+    flex-direction: column;
+  }
+
+  .settings {
+    &__preview {
+      max-width: none;
+    }
+
+    &__steps-mount {
+      align-self: flex-end;
+    }
+  }
+}

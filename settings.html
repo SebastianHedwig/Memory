@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./src/assets/favicon.png" type="image/x-icon">
+    <title>Memory | Settings</title>
+    <script type="module" src="./src/settings.ts"></script>
+</head>
+<body class="settings">
+    <main class="settings__layout">
+        <header class="settings__header">
+            <h2 class="settings__title">Settings</h2>
+            <img class="settings__title-underline" src="./src/assets/icons/settingsIcons/title-unterline.png" alt="" aria-hidden="true">
+        </header>
+        
+        <div class="settings__content">
+            <section class="settings__panel">
+                <form class="settings__form" aria-label="Spieleinstellungen" data-settings-form></form>
+            </section>
+
+            <section class="settings__preview">
+                <div class="settings__preview-card">
+                    <img src="./src/assets/img/themes/mainTheme/preview-mainTheme.png" alt="Vorschau des Main Themes">
+                </div>
+
+                <div class="settings__steps-mount" data-settings-steps></div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
