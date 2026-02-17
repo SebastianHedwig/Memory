@@ -6,6 +6,7 @@ import {
   settingsStepTemplate,
   settingsStepsTemplate,
 } from "./settings.templates";
+import { navigateTo } from "./shared/_navigation";
 
 const CHOSEN_SEPARATOR_SRC = "./src/assets/icons/settings-icons/choosen-separatorSlash.png";
 const DEFAULT_SEPARATOR_SRC = "./src/assets/icons/settings-icons/separatorSlash.png";
@@ -262,11 +263,50 @@ function bindFormChange(form: HTMLFormElement): void {
   form.addEventListener("change", () => onSettingsChange(form));
 }
 
+function getStartButtonFromEvent(event: MouseEvent): HTMLButtonElement | null {
+  if (!(event.target instanceof HTMLElement)) {
+    return null;
+  }
+
+  return event.target.closest<HTMLButtonElement>(".settings__start-button");
+}
+
+function canStartGameNavigation(startButton: HTMLButtonElement | null, form: HTMLFormElement): boolean {
+  if (!startButton || startButton.disabled) {
+    return false;
+  }
+
+  return areAllSettingsSelected(form);
+}
+
+function onStartButtonClick(event: MouseEvent, form: HTMLFormElement): void {
+  const startButton = getStartButtonFromEvent(event);
+  if (!canStartGameNavigation(startButton, form)) {
+    return;
+  }
+
+  navigateTo("game");
+}
+
+function bindStartNavigationClick(stepsMount: HTMLElement, form: HTMLFormElement): void {
+  stepsMount.addEventListener("click", (event: MouseEvent) => onStartButtonClick(event, form));
+}
+
+function bindStartNavigation(form: HTMLFormElement): void {
+  const stepsMount = getStepsMount();
+  if (!stepsMount) {
+    return;
+  }
+
+  bindStartNavigationClick(stepsMount, form);
+}
+
 function setupSettingsForm(form: HTMLFormElement): void {
   renderForm(form);
   initThemePreviewHover(form);
   onSettingsChange(form);
   bindFormChange(form);
+  bindStartNavigation(form);
 }
 
 function getSettingsForm(): HTMLFormElement | null {
