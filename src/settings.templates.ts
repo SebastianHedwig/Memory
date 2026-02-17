@@ -1,4 +1,4 @@
-const START_ICON_SRC = "./src/assets/icons/startArrowField.png";
+const START_ICON_SRC = "./src/assets/icons/start-arrow-field.png";
 
 export function settingsOptionTemplate(id: string, name: string, value: string, label: string): string {
   return /*html*/ `

@@ -7,8 +7,8 @@ import {
   settingsStepsTemplate,
 } from "./settings.templates";
 
-const CHOSEN_SEPARATOR_SRC = "./src/assets/icons/settingsIcons/choosen-separatorSlash.png";
-const DEFAULT_SEPARATOR_SRC = "./src/assets/icons/settingsIcons/separatorSlash.png";
+const CHOSEN_SEPARATOR_SRC = "./src/assets/icons/settings-icons/choosen-separatorSlash.png";
+const DEFAULT_SEPARATOR_SRC = "./src/assets/icons/settings-icons/separatorSlash.png";
 const DEFAULT_THEME_VALUE = "code-vibes";
 const REQUIRED_GROUP_NAMES = ["theme", "player", "board-size"] as const;
 
@@ -40,15 +40,15 @@ interface ThemePreview {
 
 const themePreviewByValue: Record<string, ThemePreview> = {
   [DEFAULT_THEME_VALUE]: {
-    src: "./src/assets/img/themes/mainTheme/preview-mainTheme.png",
-    alt: "Vorschau des Main Themes",
+    src: "./src/assets/img/themes/code-vibes/preview-codeVibes.png",
+    alt: "Vorschau des Code Vibes Themes",
   },
   gaming: {
-    src: "./src/assets/img/themes/gamingTheme/preview-gamingTheme.png",
+    src: "./src/assets/img/themes/gaming-theme/preview-gamingTheme.png",
     alt: "Vorschau des Gaming Themes",
   },
   foods: {
-    src: "./src/assets/img/themes/foodTheme/preview-foodTheme.png",
+    src: "./src/assets/img/themes/food-theme/preview-foodTheme.png",
     alt: "Vorschau des Food Themes",
   },
 };
@@ -87,15 +87,15 @@ function createBoardSizeOptions(): SettingsOption[] {
 }
 
 function createThemeGroup(): SettingsGroup {
-  return createGroup("Game theme", "Game Themes", "./src/assets/icons/settingsIcons/themes-icon-32.png", createThemeOptions());
+  return createGroup("Game theme", "Game Themes", "./src/assets/icons/settings-icons/themes-icon-32.png", createThemeOptions());
 }
 
 function createPlayerGroup(): SettingsGroup {
-  return createGroup("Player", "Starting Player", "./src/assets/icons/settingsIcons/choosePlayer-icon-32.png", createPlayerOptions());
+  return createGroup("Player", "Starting Player", "./src/assets/icons/settings-icons/choosePlayer-icon-32.png", createPlayerOptions());
 }
 
 function createBoardSizeGroup(): SettingsGroup {
-  return createGroup("Board size", "Board size", "./src/assets/icons/settingsIcons/boardSize-icon-32.png", createBoardSizeOptions());
+  return createGroup("Board size", "Board size", "./src/assets/icons/settings-icons/boardSize-icon-32.png", createBoardSizeOptions());
 }
 
 function createSettingsGroups(): SettingsGroup[] {
