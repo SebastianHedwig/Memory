@@ -1,0 +1,55 @@
+@use "../abstracts" as *;
+
+.game {
+  min-height: 100vh;
+}
+
+.game .content-wrapper {
+  @include centered-shell(1920px);
+  min-height: 100vh;
+}
+
+.game__layout {
+  @include centered-shell(92rem, clamp(1.25rem, 3vw, 2.5rem));
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  row-gap: clamp(1.25rem, 3.2vw, 2.5rem);
+  align-content: start;
+}
+
+.game__header {
+  width: 100%;
+}
+
+.game__player-info {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+.game__player-count {
+  justify-self: start;
+  @include flex-center(row, 1.25rem);
+}
+
+.game__player-count-inner {
+  @include inline-flex-center(0.5rem);
+}
+
+.game__player-current {
+  justify-self: center;
+  @include inline-flex-center(0.5rem);
+}
+
+.game__exit-button {
+  justify-self: end;
+}
+
+.game__board {
+  width: fit-content;
+  margin: 0 auto;
+  min-height: fit-content;
+}

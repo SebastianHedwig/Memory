@@ -26,13 +26,13 @@ export function settingsGroupTemplate(title: string, iconSrc: string, optionsMar
 }
 
 export function settingsStepTemplate(text: string, isActive: boolean): string {
-  const stepClass = /*html*/ `settings__step${isActive ? " settings__step--active" : ""}`;
-  return `<span class="${stepClass}">${text}</span>`;
+  const stepClass = `settings__step${isActive ? " settings__step--active" : ""}`;
+  return /*html*/ `<span class="${stepClass}">${text}</span>`;
 }
 
 export function settingsSeparatorTemplate(separatorSrc: string, isActive: boolean): string {
-  const separatorClass = /*html*/ `settings__separator${isActive ? " settings__separator--active" : ""}`;
-  return `<img class="${separatorClass}" src="${separatorSrc}" alt="" aria-hidden="true">`;
+  const separatorClass = `settings__separator${isActive ? " settings__separator--active" : ""}`;
+  return /*html*/ `<img class="${separatorClass}" src="${separatorSrc}" alt="" aria-hidden="true">`;
 }
 
 export function settingsStepsTemplate(renderedSteps: string, isStartEnabled: boolean): string {

@@ -1,5 +1,7 @@
 import "@scss/main.scss";
+import { bindExitOverlayActions } from "./components/exit-overlay";
 import { gameLayoutTemplate, gameOverTemplate, winnerTemplate } from "./game.templates";
+import { navigateTo } from "./shared/_navigation";
 
 type WinnerRenderData = {
   confettiSrc: string;
@@ -20,13 +22,26 @@ type ScreenRenderState =
   | { screen: "winner"; data: WinnerRenderData }
   | { screen: "gameOver"; data: GameOverRenderData };
 
+function getAppElement(): HTMLElement | null {
+  return document.querySelector<HTMLElement>("#app");
+}
+
 function renderApp(markup: string): void {
-  const appElement = document.querySelector<HTMLElement>("#app");
+  const appElement = getAppElement();
   if (!appElement) {
     return;
   }
 
   appElement.innerHTML = markup;
+}
+
+function bindExitActions(): void {
+  const appElement = getAppElement();
+  if (!appElement) {
+    return;
+  }
+
+  bindExitOverlayActions(appElement, () => navigateTo("home"));
 }
 
 function renderScreen(state: ScreenRenderState): void {
@@ -47,6 +62,7 @@ function renderScreen(state: ScreenRenderState): void {
 
 function initGamePage(): void {
   renderScreen({ screen: "game" });
+  bindExitActions();
 }
 
 if (document.readyState === "loading") {

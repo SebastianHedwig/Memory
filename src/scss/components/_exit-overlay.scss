@@ -1,0 +1,50 @@
+.game__exit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.game__exit-overlay[hidden] {
+  display: none;
+}
+
+.game__exit-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.game__exit-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: relative;
+  width: min(40rem, 100%);
+  aspect-ratio: 2 / 1;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: var(--game-exit-surface, #ffffff);
+  color: var(--game-exit-text, #1f1f1f);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
+}
+
+.game__exit-title {
+  text-align: center;
+  margin: 0 0 1rem;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.game__exit-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.game__exit-continue,
+.game__exit-confirm {
+  font-size: 1.25rem;
+}
