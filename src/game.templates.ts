@@ -1,10 +1,11 @@
-import { exitOverlayTemplate } from "./components/exit-overlay";
+import { exitOverlayTemplate, type ExitOverlayCopy } from "./components/exit-overlay";
 
 interface GameLayoutTemplateData {
   blueIconSrc: string;
   orangeIconSrc: string;
   currentPlayerIconSrc: string;
   exitButtonIconSrc: string;
+  exitOverlayCopy: ExitOverlayCopy;
 }
 
 export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
@@ -15,16 +16,18 @@ export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
           <div class="game__player-count">
             <div class="game__player-count-inner player-Blue">
               <img class="game__player-count-icon" src="${data.blueIconSrc}" alt="Blue Player Icon">
-              <span class="game__player-count-value"> Blue: 0</span>
+              <span class="game__player-count-value" data-player-score="blue">0</span>
             </div>
               <div class="game__player-count-inner player-Orange">
                 <img class="game__player-count-icon" src="${data.orangeIconSrc}" alt="Orange Player Icon">
-                <span class="game__player-count-value">Orange: 0</span>
+                <span class="game__player-count-value" data-player-score="orange">0</span>
               </div>
           </div>
           <div class="game__player-current">
             <span class="game__player-current-label">Current Player:</span>
-            <img class="game__player-current-icon" src="${data.currentPlayerIconSrc}" alt="Current Player Icon"> 
+            <div class="game__player-current-badge" data-current-player-badge>
+              <img class="game__player-current-icon" src="${data.currentPlayerIconSrc}" alt="Current Player Icon" data-current-player-icon>
+            </div>
           </div>
           <button
             class="game__exit-button button button--secondary"
@@ -37,8 +40,12 @@ export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
           </button>
         </div>
       </header>
-      <section class="game__board" data-game-board></section>
-      ${exitOverlayTemplate()}
+      <section class="game__table">
+        <aside class="game__player-stack game__player-stack--blue" data-player-stack="blue" aria-label="Blue matched cards"></aside>
+        <section class="game__board" data-game-board></section>
+        <aside class="game__player-stack game__player-stack--orange" data-player-stack="orange" aria-label="Orange matched cards"></aside>
+      </section>
+      ${exitOverlayTemplate(data.exitOverlayCopy)}
     </main>`;
 }
 

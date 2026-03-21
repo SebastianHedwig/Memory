@@ -1,1 +1,35 @@
+.game[data-theme="foods"] {
+  --memory-card-size: 7.5rem;
+  --memory-match-border-color: rgba(243, 131, 45, 1);
 
+  .game__player-count-inner {
+    width: 10rem;
+    justify-content: flex-start;
+  }
+
+  .game__player-count-value {
+    font-size: 1.875rem;
+    min-width: 2ch;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .game__player-current-badge {
+    width: 2.625rem;
+    height: 2.5rem;
+    border-radius: 0.2rem;
+  }
+
+  .game__player-current-badge[data-player="blue"] {
+    background-color: rgba(78, 160, 226, 1);
+  }
+
+  .game__player-current-badge[data-player="orange"] {
+    background-color: rgba(243, 131, 45, 1);
+  }
+
+  .game__player-current-icon {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+}

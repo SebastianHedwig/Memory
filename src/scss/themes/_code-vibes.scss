@@ -1,6 +1,9 @@
 @use "../abstracts" as *;
 
 .game[data-theme="code-vibes"] {
+  --memory-card-size: 7.5rem;
+  --memory-match-border-color: rgba(77, 213, 188, 1);
+
   .game__player-info {
     display: flex;
     align-items: center;
@@ -17,6 +20,7 @@
     font-family: "Red Rose";
     font-weight: 700;
     line-height: 1;
+    gap: 1.25rem;
   }
 
   .game__player-count-inner {
@@ -29,7 +33,7 @@
   }
 
   .game__player-count-value {
-    font-size: 1.95rem;
+    font-size: 1.5rem;
     letter-spacing: 0.01em;
   }
 
