@@ -1,23 +1,30 @@
 import { exitOverlayTemplate } from "./components/exit-overlay";
 
-export function gameLayoutTemplate(): string {
+interface GameLayoutTemplateData {
+  blueIconSrc: string;
+  orangeIconSrc: string;
+  currentPlayerIconSrc: string;
+  exitButtonIconSrc: string;
+}
+
+export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
   return /*html*/ `
     <main class="game__layout">
       <header class="game__header">
         <div class="game__player-info">
           <div class="game__player-count">
             <div class="game__player-count-inner player-Blue">
-              <img class="game__player-count-icon" src="/src/assets/images/player-icon.svg" alt="Player Icon">
+              <img class="game__player-count-icon" src="${data.blueIconSrc}" alt="Blue Player Icon">
               <span class="game__player-count-value"> Blue: 0</span>
             </div>
               <div class="game__player-count-inner player-Orange">
-                <img class="game__player-count-icon" src="/src/assets/images/player-icon.svg" alt="Player Icon">
+                <img class="game__player-count-icon" src="${data.orangeIconSrc}" alt="Orange Player Icon">
                 <span class="game__player-count-value">Orange: 0</span>
               </div>
           </div>
           <div class="game__player-current">
             <span class="game__player-current-label">Current Player:</span>
-            <img class="game__player-current-icon" src="#" alt="Player Icon"> 
+            <img class="game__player-current-icon" src="${data.currentPlayerIconSrc}" alt="Current Player Icon"> 
           </div>
           <button
             class="game__exit-button button button--secondary"
@@ -25,7 +32,8 @@ export function gameLayoutTemplate(): string {
             data-action="open-exit-overlay"
             aria-haspopup="dialog"
             aria-controls="game-exit-overlay">
-            <span class="game__exit-button-label">Exit Game</span>
+            <img class="game__exit-button-icon button__icon" src="${data.exitButtonIconSrc}" alt="" aria-hidden="true">
+            <span class="game__exit-button-label">Exit game</span>
           </button>
         </div>
       </header>

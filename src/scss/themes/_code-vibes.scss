@@ -1,1 +1,93 @@
+@use "../abstracts" as *;
 
+.game[data-theme="code-vibes"] {
+  .game__player-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .game__player-count {
+    margin-right: auto;
+    min-height: 4rem;
+    padding: 0.75rem 1.25rem;
+    background-color: rgb(61, 75, 72);
+    font-family: "Red Rose";
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .game__player-count-inner {
+    gap: 0.35rem;
+  }
+
+  .game__player-count-icon {
+    width: 1.65rem;
+    height: 1.45rem;
+  }
+
+  .game__player-count-value {
+    font-size: 1.95rem;
+    letter-spacing: 0.01em;
+  }
+
+  .player-Blue {
+    color: rgba(43, 177, 255, 1);
+  }
+
+  .player-Orange {
+    color: rgba(245, 142, 57, 1);
+  }
+
+  .game__player-current {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(255, 255, 255);
+    font-family: "Red Rose";
+    font-weight: 700;
+    gap: 0.5rem;
+  }
+
+  .game__player-current-label {
+    font-size: 1.625rem;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .game__player-current-icon {
+    width: 1.9rem;
+    height: 1.6rem;
+  }
+
+  .game__exit-button {
+    @include inline-flex-center(0.875rem);
+    margin-left: auto;
+    border: 2px solid rgba(77, 213, 188, 1);
+    background-color: rgb(61, 75, 72);
+    color: rgb(255, 255, 255);
+    font-family: "Red Rose";
+    font-weight: 700;
+    line-height: 1;
+    transition: none;
+  }
+
+  .game__exit-button:not(:disabled):hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow:
+      inset 0 0 0 1px rgba(77, 213, 188, 1),
+      0.3rem 0.38rem 0.75rem rgba(255, 255, 255, 0.26);
+  }
+
+  .game__exit-button:not(:disabled):active {
+    transform: none;
+  }
+
+  .game__exit-button-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+}

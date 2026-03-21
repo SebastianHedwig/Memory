@@ -6,11 +6,12 @@ import {
   settingsStepTemplate,
   settingsStepsTemplate,
 } from "./settings.templates";
+import { DEFAULT_THEME, type GameSettings, writeGameSettings } from "./shared/_game-settings";
 import { navigateTo } from "./shared/_navigation";
 
 const CHOSEN_SEPARATOR_SRC = "./src/assets/icons/settings-icons/choosen-separatorSlash.png";
 const DEFAULT_SEPARATOR_SRC = "./src/assets/icons/settings-icons/separatorSlash.png";
-const DEFAULT_THEME_VALUE = "code-vibes";
+const DEFAULT_BOARD_SIZE = 16;
 const REQUIRED_GROUP_NAMES = ["theme", "player", "board-size"] as const;
 
 interface SettingsOption {
@@ -39,8 +40,8 @@ interface ThemePreview {
   alt: string;
 }
 
-const themePreviewByValue: Record<string, ThemePreview> = {
-  [DEFAULT_THEME_VALUE]: {
+const themePreviewByValue: Record<GameSettings["theme"], ThemePreview> = {
+  "code-vibes": {
     src: "./src/assets/img/themes/code-vibes/preview-codeVibes.png",
     alt: "Vorschau des Code Vibes Themes",
   },
@@ -54,7 +55,7 @@ const themePreviewByValue: Record<string, ThemePreview> = {
   },
 };
 
-let selectedThemeValue = DEFAULT_THEME_VALUE;
+let selectedThemeValue: GameSettings["theme"] = DEFAULT_THEME;
 
 function createOption(id: string, name: string, value: string, label: string): SettingsOption {
   return { id, name, value, label };
@@ -207,7 +208,11 @@ function getPreviewImage(): HTMLImageElement | null {
 }
 
 function getThemePreview(themeValue: string): ThemePreview {
-  return themePreviewByValue[themeValue] ?? themePreviewByValue[DEFAULT_THEME_VALUE];
+  if (themeValue === "gaming" || themeValue === "foods" || themeValue === DEFAULT_THEME) {
+    return themePreviewByValue[themeValue];
+  }
+
+  return themePreviewByValue[DEFAULT_THEME];
 }
 
 function applyThemePreview(previewImage: HTMLImageElement, preview: ThemePreview): void {
@@ -225,8 +230,35 @@ function setThemePreview(themeValue: string): void {
   applyThemePreview(previewImage, getThemePreview(themeValue));
 }
 
-function getSelectedThemeValue(form: HTMLFormElement): string {
-  return getCheckedInput(form, "theme")?.value ?? DEFAULT_THEME_VALUE;
+function getSelectedThemeValue(form: HTMLFormElement): GameSettings["theme"] {
+  const value = getCheckedInput(form, "theme")?.value;
+  if (value === "gaming" || value === "foods") {
+    return value;
+  }
+
+  return DEFAULT_THEME;
+}
+
+function getSelectedPlayerValue(form: HTMLFormElement): GameSettings["player"] {
+  return getCheckedInput(form, "player")?.value === "orange" ? "orange" : "blue";
+}
+
+function getSelectedBoardSize(form: HTMLFormElement): number {
+  const value = getCheckedInput(form, "board-size")?.value;
+  const parsed = Number.parseInt(value ?? String(DEFAULT_BOARD_SIZE), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_BOARD_SIZE;
+}
+
+function buildGameSettings(form: HTMLFormElement): GameSettings {
+  return {
+    theme: getSelectedThemeValue(form),
+    player: getSelectedPlayerValue(form),
+    boardSize: getSelectedBoardSize(form),
+  };
+}
+
+function persistGameSettings(form: HTMLFormElement): void {
+  writeGameSettings(buildGameSettings(form));
 }
 
 function syncThemePreviewToSelection(form: HTMLFormElement): void {
@@ -285,6 +317,7 @@ function onStartButtonClick(event: MouseEvent, form: HTMLFormElement): void {
     return;
   }
 
+  persistGameSettings(form);
   navigateTo("game");
 }
 

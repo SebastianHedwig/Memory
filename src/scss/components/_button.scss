@@ -15,6 +15,14 @@
     background-color: $primary-btn-color;
   }
 
+  &--secondary {
+    width: 13rem;
+    height: 4rem;
+    padding: 1rem 1.625rem;
+    font-size: 1.5rem;
+    text-wrap: nowrap;
+  }
+
   &:not(:disabled):hover {
     transform: translateY(-2px) scale(1.06);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
@@ -30,5 +38,12 @@
     opacity: 0.55;
     transform: none;
     box-shadow: none;
+  }
+
+  &__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: 0 0 auto;
+    object-fit: contain;
   }
 }
