@@ -3,6 +3,15 @@ import { memoryCardTemplate, type MemoryCardData } from "../components/memory-ca
 import type { GameSettings } from "../shared/_game-settings";
 import type { GameLayoutAssets, PlayerColor } from "./types";
 
+const THEME_IMAGE_URL_BY_SOURCE = import.meta.glob("../assets/img/themes/**/*", { eager: true, import: "default" }) as Record<
+  string,
+  string
+>;
+const CURRENT_PLAYER_ICON_URL_BY_SOURCE = import.meta.glob("../assets/icons/current-player.png", {
+  eager: true,
+  import: "default",
+}) as Record<string, string>;
+
 const THEME_FOLDER_BY_VALUE: Record<GameSettings["theme"], string> = {
   "code-vibes": "code-vibes",
   "gaming": "gaming-theme",
@@ -37,7 +46,8 @@ export function getThemeAssetsFolder(theme: GameSettings["theme"]): string {
  * @returns Generated string value for rendering or downstream processing.
  */
 export function createThemeAssetPath(themeFolder: string, fileName: string): string {
-  return `./src/assets/img/themes/${themeFolder}/${fileName}`;
+  const sourcePath = `../assets/img/themes/${themeFolder}/${fileName}`;
+  return THEME_IMAGE_URL_BY_SOURCE[sourcePath] ?? "";
 }
 
 /**
@@ -56,7 +66,7 @@ function getCurrentPlayerIcon(player: PlayerColor, blueIconSrc: string, orangeIc
  * @returns Generated string value for rendering or downstream processing.
  */
 export function getStaticCurrentPlayerIcon(): string {
-  return "./src/assets/icons/current-player.png";
+  return CURRENT_PLAYER_ICON_URL_BY_SOURCE["../assets/icons/current-player.png"] ?? "";
 }
 
 /**

@@ -1,4 +1,12 @@
 import "@scss/main.scss";
+import boardSizeIcon32Src from "@assets/icons/settings-icons/boardSize-icon-32.png";
+import chosenSeparatorSlashSrc from "@assets/icons/settings-icons/choosen-separatorSlash.png";
+import choosePlayerIcon32Src from "@assets/icons/settings-icons/choosePlayer-icon-32.png";
+import separatorSlashSrc from "@assets/icons/settings-icons/separatorSlash.png";
+import themesIcon32Src from "@assets/icons/settings-icons/themes-icon-32.png";
+import previewCodeVibesSrc from "@assets/img/themes/code-vibes/preview-codeVibes.png";
+import previewFoodThemeSrc from "@assets/img/themes/food-theme/preview-foodTheme.png";
+import previewGamingThemeSrc from "@assets/img/themes/gaming-theme/preview-gamingTheme.png";
 import {
   settingsGroupTemplate,
   settingsOptionTemplate,
@@ -9,8 +17,8 @@ import {
 import { DEFAULT_THEME, type GameSettings, writeGameSettings } from "./shared/_game-settings";
 import { navigateTo } from "./shared/_navigation";
 
-const CHOSEN_SEPARATOR_SRC = "./src/assets/icons/settings-icons/choosen-separatorSlash.png";
-const DEFAULT_SEPARATOR_SRC = "./src/assets/icons/settings-icons/separatorSlash.png";
+const CHOSEN_SEPARATOR_SRC = chosenSeparatorSlashSrc;
+const DEFAULT_SEPARATOR_SRC = separatorSlashSrc;
 const DEFAULT_BOARD_SIZE = 16;
 const REQUIRED_GROUP_NAMES = ["theme", "player", "board-size"] as const;
 
@@ -42,15 +50,15 @@ interface ThemePreview {
 
 const themePreviewByValue: Record<GameSettings["theme"], ThemePreview> = {
   "code-vibes": {
-    src: "./src/assets/img/themes/code-vibes/preview-codeVibes.png",
+    src: previewCodeVibesSrc,
     alt: "Vorschau des Code Vibes Themes",
   },
   gaming: {
-    src: "./src/assets/img/themes/gaming-theme/preview-gamingTheme.png",
+    src: previewGamingThemeSrc,
     alt: "Vorschau des Gaming Themes",
   },
   foods: {
-    src: "./src/assets/img/themes/food-theme/preview-foodTheme.png",
+    src: previewFoodThemeSrc,
     alt: "Vorschau des Food Themes",
   },
 };
@@ -121,7 +129,7 @@ function createBoardSizeOptions(): SettingsOption[] {
  * @returns Value of type `SettingsGroup`.
  */
 function createThemeGroup(): SettingsGroup {
-  return createGroup("Game theme", "Game Themes", "./src/assets/icons/settings-icons/themes-icon-32.png", createThemeOptions());
+  return createGroup("Game theme", "Game Themes", themesIcon32Src, createThemeOptions());
 }
 
 /**
@@ -129,7 +137,7 @@ function createThemeGroup(): SettingsGroup {
  * @returns Value of type `SettingsGroup`.
  */
 function createPlayerGroup(): SettingsGroup {
-  return createGroup("Player", "Starting Player", "./src/assets/icons/settings-icons/choosePlayer-icon-32.png", createPlayerOptions());
+  return createGroup("Player", "Starting Player", choosePlayerIcon32Src, createPlayerOptions());
 }
 
 /**
@@ -137,7 +145,7 @@ function createPlayerGroup(): SettingsGroup {
  * @returns Value of type `SettingsGroup`.
  */
 function createBoardSizeGroup(): SettingsGroup {
-  return createGroup("Board size", "Board size", "./src/assets/icons/settings-icons/boardSize-icon-32.png", createBoardSizeOptions());
+  return createGroup("Board size", "Board size", boardSizeIcon32Src, createBoardSizeOptions());
 }
 
 /**

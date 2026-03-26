@@ -1,4 +1,4 @@
-const START_ICON_SRC = "./src/assets/icons/start-arrow-field.png";
+import startIconSrc from "@assets/icons/start-arrow-field.png";
 
 /**
  * Updates Settings Option Template on the target element or state.
@@ -73,7 +73,7 @@ export function settingsStepsTemplate(renderedSteps: string, isStartEnabled: boo
     <nav class="settings__steps" aria-label="Settings navigation">
       ${renderedSteps}
       <button class="settings__start-button button button--primary" type="button"${isStartEnabled ? "" : " disabled"}>
-        <img class="settings__start-icon" src="${START_ICON_SRC}" alt="" aria-hidden="true">
+        <img class="settings__start-icon" src="${startIconSrc}" alt="" aria-hidden="true">
         Start
       </button>
     </nav>`;
