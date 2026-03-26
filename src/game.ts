@@ -1,90 +1,14 @@
 import "@scss/main.scss";
-import { bindExitOverlayActions, getExitOverlayCopy, type ExitOverlayCopy } from "./components/exit-overlay";
-import { memoryCardTemplate, type MemoryCardData } from "./components/memory-card";
-import { drawTemplate, gameLayoutTemplate, gameOverTemplate, winnerTemplate } from "./game.templates";
-import { readGameSettings, type GameSettings } from "./shared/_game-settings";
+import { bindExitOverlayActions } from "./components/exit-overlay";
+import { bindBoardActions } from "./game/board-controller";
+import { WINNER_AUTO_ADVANCE_MS, WINNER_CONTINUE_UNLOCK_MS, WINNER_FLOW_INIT_DELAY_MS } from "./game/constants";
+import { applyGameTheme, getGameLayoutAssets, renderMemoryBoard } from "./game/assets";
+import { createDrawRenderData, createGameOverRenderData, createWinnerRenderData, hasDraw } from "./game/outcome";
+import { getAppElement, renderScreen, renderScreenWithTransition } from "./game/screen";
+import type { MemoryGameState, ScreenRenderState } from "./game/types";
+import { createMemoryGameState, renderCurrentPlayer, renderScores } from "./game/ui-state";
+import { readGameSettings } from "./shared/_game-settings";
 import { navigateTo } from "./shared/_navigation";
-
-type PlayerColor = "blue" | "orange";
-
-type WinnerRenderData = {
-  confettiSrc: string;
-  playerName: string;
-  playerColor: PlayerColor;
-  playerImageSrc: string;
-  playerImageAlt: string;
-  pedestalLabel?: string;
-};
-
-type GameOverRenderData = {
-  blueIconSrc: string;
-  blueScore: number;
-  orangeIconSrc: string;
-  orangeScore: number;
-};
-
-type DrawRenderData = {
-  confettiSrc: string;
-};
-
-type ScreenRenderState =
-  | { screen: "game"; data: GameLayoutAssets }
-  | { screen: "winner"; data: WinnerRenderData }
-  | { screen: "draw"; data: DrawRenderData }
-  | { screen: "gameOver"; data: GameOverRenderData };
-
-interface GameLayoutAssets {
-  blueIconSrc: string;
-  orangeIconSrc: string;
-  currentPlayerIconSrc: string;
-  exitButtonIconSrc: string;
-  exitButtonLabel: string;
-  exitOverlayCopy: ExitOverlayCopy;
-}
-
-interface MemoryGameState {
-  settings: GameSettings;
-  currentPlayer: PlayerColor;
-  scores: Record<PlayerColor, number>;
-  revealedCardIds: string[];
-  matchedPairIds: Set<string>;
-  cardsById: Map<string, MemoryCardData>;
-  totalPairs: number;
-  isBoardLocked: boolean;
-  playerIconSources: Record<PlayerColor, string>;
-  currentPlayerIconSrc: string;
-}
-
-const themeFolderByValue: Record<GameSettings["theme"], string> = {
-  "code-vibes": "code-vibes",
-  "gaming": "gaming-theme",
-  "foods": "food-theme",
-};
-
-const boardColumnsByCardCount: Record<number, number> = {
-  16: 4,
-  24: 6,
-  36: 6,
-};
-
-const themeCardCountByValue: Record<GameSettings["theme"], number> = {
-  "code-vibes": 18,
-  "gaming": 18,
-  "foods": 18,
-};
-
-const MATCH_BORDER_DRAW_MS = 950;
-const MATCH_BORDER_HOLD_MS = 260;
-const MATCH_COLLECT_DELAY_MS = MATCH_BORDER_DRAW_MS + MATCH_BORDER_HOLD_MS;
-const MISMATCH_FLIP_DELAY_MS = 700;
-const CARD_FLY_DURATION_MS = 760;
-const STACK_PILE_CARD_LIMIT = 16;
-const SCREEN_LEAVE_ANIMATION_MS = 260;
-const WINNER_CONTINUE_UNLOCK_MS = 2000;
-const WINNER_AUTO_ADVANCE_MS = 10000;
-const WINNER_FLOW_INIT_DELAY_MS = SCREEN_LEAVE_ANIMATION_MS + 40;
-
-const WINNER_ASSET_THEME = "code-vibes";
 
 let memoryGameState: MemoryGameState | null = null;
 let winnerCanContinue = false;
@@ -92,174 +16,10 @@ let winnerContinueTimeoutId: number | null = null;
 let winnerAutoAdvanceTimeoutId: number | null = null;
 let winnerClickCleanup: (() => void) | null = null;
 
-function getThemeAssetsFolder(theme: GameSettings["theme"]): string {
-  return themeFolderByValue[theme];
-}
-
-function createThemeAssetPath(themeFolder: string, fileName: string): string {
-  return `./src/assets/img/themes/${themeFolder}/${fileName}`;
-}
-
-function getCurrentPlayerIcon(player: PlayerColor, blueIconSrc: string, orangeIconSrc: string): string {
-  return player === "orange" ? orangeIconSrc : blueIconSrc;
-}
-
-function getStaticCurrentPlayerIcon(settings: GameSettings): string {
-  return "./src/assets/icons/current-player.png";
-}
-
-function getInitialCurrentPlayerIcon(settings: GameSettings, blueIconSrc: string, orangeIconSrc: string): string {
-  if (settings.theme === "code-vibes") {
-    return getCurrentPlayerIcon(settings.player, blueIconSrc, orangeIconSrc);
-  }
-
-  return getStaticCurrentPlayerIcon(settings);
-}
-
-function getExitButtonLabel(theme: GameSettings["theme"]): string {
-  if (theme === "foods") {
-    return "EXIT game";
-  }
-
-  return "Exit game";
-}
-
-function getGameLayoutAssets(settings: GameSettings): GameLayoutAssets {
-  const themeFolder = getThemeAssetsFolder(settings.theme);
-  const blueIconSrc = createThemeAssetPath(themeFolder, "player-icon-blue.png");
-  const orangeIconSrc = createThemeAssetPath(themeFolder, "player-icon-orange.png");
-  const exitButtonIconSrc = createThemeAssetPath(themeFolder, "exit-btn-icon.png");
-
-  return {
-    blueIconSrc,
-    orangeIconSrc,
-    currentPlayerIconSrc: getInitialCurrentPlayerIcon(settings, blueIconSrc, orangeIconSrc),
-    exitButtonIconSrc,
-    exitButtonLabel: getExitButtonLabel(settings.theme),
-    exitOverlayCopy: getExitOverlayCopy(settings.theme),
-  };
-}
-
-function getPlayerIconSources(settings: GameSettings): Record<PlayerColor, string> {
-  const themeFolder = getThemeAssetsFolder(settings.theme);
-  return {
-    blue: createThemeAssetPath(themeFolder, "player-icon-blue.png"),
-    orange: createThemeAssetPath(themeFolder, "player-icon-orange.png"),
-  };
-}
-
-function applyGameTheme(theme: GameSettings["theme"]): void {
-  document.body.dataset.theme = theme;
-}
-
-function applyScreenState(screen: ScreenRenderState["screen"]): void {
-  if (screen === "gameOver") {
-    document.body.dataset.screen = "game-over";
-    return;
-  }
-
-  document.body.dataset.screen = screen;
-}
-
-function getBoardElement(): HTMLElement | null {
-  return document.querySelector<HTMLElement>("[data-game-board]") ?? document.querySelector<HTMLElement>(".game__board");
-}
-
-function getBoardColumnCount(cardCount: number): number {
-  return boardColumnsByCardCount[cardCount] ?? 4;
-}
-
-function getThemeCardCount(theme: GameSettings["theme"]): number {
-  return themeCardCountByValue[theme];
-}
-
-function createCardFileName(index: number): string {
-  return `card-${String(index).padStart(3, "0")}.png`;
-}
-
-function createThemeCardFaceSources(settings: GameSettings): string[] {
-  const themeFolder = getThemeAssetsFolder(settings.theme);
-  const cardCount = getThemeCardCount(settings.theme);
-  return Array.from({ length: cardCount }, (_, index) => {
-    return createThemeAssetPath(themeFolder, `cards/${createCardFileName(index + 1)}`);
-  });
-}
-
-function createThemeCardCoverSource(settings: GameSettings): string {
-  const themeFolder = getThemeAssetsFolder(settings.theme);
-  return createThemeAssetPath(themeFolder, "cards/card-cover.png");
-}
-
-function shuffleList<T>(items: T[]): T[] {
-  const nextItems = [...items];
-  for (let index = nextItems.length - 1; index > 0; index--) {
-    const targetIndex = Math.floor(Math.random() * (index + 1));
-    const currentItem = nextItems[index];
-    nextItems[index] = nextItems[targetIndex];
-    nextItems[targetIndex] = currentItem;
-  }
-
-  return nextItems;
-}
-
-function getRandomCardFaces(sources: string[], pairCount: number): string[] {
-  return shuffleList(sources).slice(0, pairCount);
-}
-
-function createCardPair(faceSrc: string, coverSrc: string, pairIndex: number): MemoryCardData[] {
-  const pairId = `pair-${pairIndex + 1}`;
-  return [
-    { id: `${pairId}-a`, pairId, coverSrc, faceSrc },
-    { id: `${pairId}-b`, pairId, coverSrc, faceSrc },
-  ];
-}
-
-function createMemoryDeck(settings: GameSettings): MemoryCardData[] {
-  const coverSrc = createThemeCardCoverSource(settings);
-  const faceSources = createThemeCardFaceSources(settings);
-  const requestedPairCount = Math.floor(settings.boardSize / 2);
-  const pairCount = Math.min(requestedPairCount, faceSources.length);
-  const selectedFaces = getRandomCardFaces(faceSources, pairCount);
-  const cardPairs = selectedFaces.flatMap((faceSrc, pairIndex) => {
-    return createCardPair(faceSrc, coverSrc, pairIndex);
-  });
-
-  return shuffleList(cardPairs);
-}
-
-function clearPlayerStacks(): void {
-  const stackElements = document.querySelectorAll<HTMLElement>("[data-player-stack]");
-  stackElements.forEach((stackElement) => {
-    stackElement.innerHTML = "";
-  });
-}
-
-function renderMemoryBoard(settings: GameSettings): MemoryCardData[] {
-  const boardElement = getBoardElement();
-  const deck = createMemoryDeck(settings);
-  if (!boardElement) {
-    return deck;
-  }
-
-  boardElement.style.setProperty("--game-board-columns", String(getBoardColumnCount(settings.boardSize)));
-  boardElement.innerHTML = deck.map((card) => memoryCardTemplate(card)).join("");
-  clearPlayerStacks();
-  return deck;
-}
-
-function getAppElement(): HTMLElement | null {
-  return document.querySelector<HTMLElement>("#app");
-}
-
-function renderApp(markup: string): void {
-  const appElement = getAppElement();
-  if (!appElement) {
-    return;
-  }
-
-  appElement.innerHTML = markup;
-}
-
+/**
+ * Binds event handlers for Exit Actions.
+ * @returns No return value; this function works via side effects.
+ */
 function bindExitActions(): void {
   const appElement = getAppElement();
   if (!appElement) {
@@ -269,6 +29,11 @@ function bindExitActions(): void {
   bindExitOverlayActions(appElement, () => navigateTo("home"));
 }
 
+/**
+ * Finds the closest actionable element from the event target using `data-action`.
+ * @param target Original event target used for DOM lookup.
+ * @returns Resolved `HTMLElement`, or `null` when no matching element can be resolved.
+ */
 function getActionTarget(target: EventTarget | null): HTMLElement | null {
   if (!(target instanceof HTMLElement)) {
     return null;
@@ -277,11 +42,21 @@ function getActionTarget(target: EventTarget | null): HTMLElement | null {
   return target.closest<HTMLElement>("[data-action]");
 }
 
+/**
+ * Reads the action value from the resolved action element.
+ * @param target Original event target used for DOM lookup.
+ * @returns Value of type `string`, or `null` when no valid value can be resolved.
+ */
 function getActionValue(target: EventTarget | null): string | null {
   const actionTarget = getActionTarget(target);
   return actionTarget?.dataset.action ?? null;
 }
 
+/**
+ * Executes global game-page actions such as navigation.
+ * @param action Action name read from a `data-action` attribute.
+ * @returns No return value; this function works via side effects.
+ */
 function handleGamePageAction(action: string): void {
   if (action === "play-again") {
     navigateTo("settings");
@@ -293,6 +68,11 @@ function handleGamePageAction(action: string): void {
   }
 }
 
+/**
+ * Handles events for Game Page Click.
+ * @param event DOM event triggered by the current user interaction.
+ * @returns No return value; this function works via side effects.
+ */
 function onGamePageClick(event: MouseEvent): void {
   const action = getActionValue(event.target);
   if (!action) {
@@ -302,6 +82,10 @@ function onGamePageClick(event: MouseEvent): void {
   handleGamePageAction(action);
 }
 
+/**
+ * Binds event handlers for Game Page Actions.
+ * @returns No return value; this function works via side effects.
+ */
 function bindGamePageActions(): void {
   const appElement = getAppElement();
   if (!appElement) {
@@ -311,233 +95,26 @@ function bindGamePageActions(): void {
   appElement.addEventListener("click", onGamePageClick);
 }
 
-function renderScreen(state: ScreenRenderState): void {
-  applyScreenState(state.screen);
-
-  switch (state.screen) {
-    case "game":
-      renderApp(gameLayoutTemplate(state.data));
-      return;
-    case "winner":
-      renderApp(winnerTemplate(state.data));
-      return;
-    case "draw":
-      renderApp(drawTemplate(state.data));
-      return;
-    case "gameOver":
-      renderApp(gameOverTemplate(state.data));
-      return;
-    default:
-      return;
-  }
-}
-
-function getCurrentScreenElement(): HTMLElement | null {
-  const appElement = getAppElement();
-  if (!appElement) {
-    return null;
-  }
-
-  return appElement.firstElementChild instanceof HTMLElement ? appElement.firstElementChild : null;
-}
-
-function prepareEnteringScreen(element: HTMLElement): void {
-  element.classList.add("screen-transition-enter");
-  requestAnimationFrame(() => {
-    element.classList.add("is-visible");
-  });
-}
-
-function renderScreenWithTransition(state: ScreenRenderState): void {
-  const currentScreenElement = getCurrentScreenElement();
-  if (!currentScreenElement) {
-    renderScreen(state);
-    const nextScreenElement = getCurrentScreenElement();
-    if (nextScreenElement) {
-      prepareEnteringScreen(nextScreenElement);
-    }
-
-    return;
-  }
-
-  currentScreenElement.classList.add("screen-transition-leave");
-  window.setTimeout(() => {
-    renderScreen(state);
-    const nextScreenElement = getCurrentScreenElement();
-    if (!nextScreenElement) {
-      return;
-    }
-
-    prepareEnteringScreen(nextScreenElement);
-  }, SCREEN_LEAVE_ANIMATION_MS);
-}
-
-function createScores(): Record<PlayerColor, number> {
-  return { blue: 0, orange: 0 };
-}
-
-function createCardsById(deck: MemoryCardData[]): Map<string, MemoryCardData> {
-  return new Map(deck.map((card) => [card.id, card]));
-}
-
-function createMemoryGameState(settings: GameSettings, deck: MemoryCardData[]): MemoryGameState {
-  return {
-    settings,
-    currentPlayer: settings.player,
-    scores: createScores(),
-    revealedCardIds: [],
-    matchedPairIds: new Set<string>(),
-    cardsById: createCardsById(deck),
-    totalPairs: Math.floor(deck.length / 2),
-    isBoardLocked: false,
-    playerIconSources: getPlayerIconSources(settings),
-    currentPlayerIconSrc: getStaticCurrentPlayerIcon(settings),
-  };
-}
-
-function playerLabel(player: PlayerColor): string {
-  return player === "blue" ? "Blue" : "Orange";
-}
-
-function getScoreLabel(state: MemoryGameState, player: PlayerColor): string {
-  const score = state.scores[player];
-  if (state.settings.theme === "code-vibes") {
-    return `${playerLabel(player)} ${score}`;
-  }
-
-  return String(score);
-}
-
-function getScoreElement(player: PlayerColor): HTMLElement | null {
-  return document.querySelector<HTMLElement>(`[data-player-score="${player}"]`);
-}
-
-function renderScores(state: MemoryGameState): void {
-  const blueScoreElement = getScoreElement("blue");
-  if (blueScoreElement) {
-    blueScoreElement.textContent = getScoreLabel(state, "blue");
-  }
-
-  const orangeScoreElement = getScoreElement("orange");
-  if (orangeScoreElement) {
-    orangeScoreElement.textContent = getScoreLabel(state, "orange");
-  }
-}
-
-function getCurrentPlayerIconElement(): HTMLImageElement | null {
-  return document.querySelector<HTMLImageElement>("[data-current-player-icon]");
-}
-
-function getCurrentPlayerBadgeElement(): HTMLElement | null {
-  return document.querySelector<HTMLElement>("[data-current-player-badge]");
-}
-
-function renderCurrentPlayer(state: MemoryGameState): void {
-  const currentPlayerIconElement = getCurrentPlayerIconElement();
-  if (currentPlayerIconElement) {
-    currentPlayerIconElement.src =
-      state.settings.theme === "code-vibes"
-        ? state.playerIconSources[state.currentPlayer]
-        : state.currentPlayerIconSrc;
-  }
-
-  const currentPlayerBadgeElement = getCurrentPlayerBadgeElement();
-  if (currentPlayerBadgeElement) {
-    currentPlayerBadgeElement.dataset.player = state.currentPlayer;
-  }
-}
-
-function getWinnerPlayer(state: MemoryGameState): PlayerColor {
-  if (state.scores.blue > state.scores.orange) {
-    return "blue";
-  }
-
-  if (state.scores.orange > state.scores.blue) {
-    return "orange";
-  }
-
-  return state.currentPlayer;
-}
-
-function getWinnerPlayerName(player: PlayerColor): string {
-  return player === "blue" ? "BLUE PLAYER" : "ORANGE PLAYER";
-}
-
-function getGamingWinnerPlayerName(player: PlayerColor): string {
-  return player === "blue" ? "Blue Player" : "Orange Player";
-}
-
-function getWinnerPlayerImageAlt(player: PlayerColor): string {
-  return player === "blue" ? "Blue player winner icon" : "Orange player winner icon";
-}
-
-function getWinnerConfettiSource(theme: GameSettings["theme"]): string {
-  if (theme === "gaming" || theme === "foods") {
-    return "";
-  }
-
-  return createThemeAssetPath(getThemeAssetsFolder(WINNER_ASSET_THEME), "confetti.png");
-}
-
-function createWinnerRenderData(state: MemoryGameState): WinnerRenderData {
-  if (state.settings.theme === "gaming") {
-    const winnerPlayer = getWinnerPlayer(state);
-    const themeFolder = getThemeAssetsFolder(state.settings.theme);
-    return {
-      confettiSrc: "",
-      playerName: getGamingWinnerPlayerName(winnerPlayer),
-      playerColor: winnerPlayer,
-      playerImageSrc: createThemeAssetPath(themeFolder, "winner-pot.png"),
-      playerImageAlt: "Winner trophy",
-      pedestalLabel: winnerPlayer === "blue" ? "BLUE" : "ORANGE",
-    };
-  }
-
-  const winnerPlayer = getWinnerPlayer(state);
-  const winnerThemeFolder = getThemeAssetsFolder(WINNER_ASSET_THEME);
-  const winnerPlayerImageName =
-    winnerPlayer === "blue" ? "player-icon-blue-large.png" : "player-icon-orange-large.png";
-
-  return {
-    confettiSrc: getWinnerConfettiSource(state.settings.theme),
-    playerName: getWinnerPlayerName(winnerPlayer),
-    playerColor: winnerPlayer,
-    playerImageSrc: createThemeAssetPath(winnerThemeFolder, winnerPlayerImageName),
-    playerImageAlt: getWinnerPlayerImageAlt(winnerPlayer),
-  };
-}
-
-function createDrawRenderData(settings: GameSettings): DrawRenderData {
-  return {
-    confettiSrc: getWinnerConfettiSource(settings.theme),
-  };
-}
-
-function createGameOverRenderData(state: MemoryGameState): GameOverRenderData {
-  return {
-    blueIconSrc: state.playerIconSources.blue,
-    blueScore: state.scores.blue,
-    orangeIconSrc: state.playerIconSources.orange,
-    orangeScore: state.scores.orange,
-  };
-}
-
-function isGameFinished(state: MemoryGameState): boolean {
-  return state.matchedPairIds.size >= state.totalPairs;
-}
-
-function hasDraw(state: MemoryGameState): boolean {
-  return state.scores.blue === state.scores.orange;
-}
-
+/**
+ * Returns Winner Screen Element from the current DOM/state context.
+ * @returns Resolved `HTMLElement`, or `null` when no matching element can be resolved.
+ */
 function getWinnerScreenElement(): HTMLElement | null {
   return document.querySelector<HTMLElement>("[data-winner-screen]");
 }
 
+/**
+ * Returns Winner Continue Element from the current DOM/state context.
+ * @returns Resolved `HTMLElement`, or `null` when no matching element can be resolved.
+ */
 function getWinnerContinueElement(): HTMLElement | null {
   return document.querySelector<HTMLElement>("[data-winner-continue]");
 }
 
+/**
+ * Clears Winner Continue Timer and related transient state.
+ * @returns No return value; this function works via side effects.
+ */
 function clearWinnerContinueTimer(): void {
   if (winnerContinueTimeoutId === null) {
     return;
@@ -547,6 +124,10 @@ function clearWinnerContinueTimer(): void {
   winnerContinueTimeoutId = null;
 }
 
+/**
+ * Clears Winner Auto Timer and related transient state.
+ * @returns No return value; this function works via side effects.
+ */
 function clearWinnerAutoTimer(): void {
   if (winnerAutoAdvanceTimeoutId === null) {
     return;
@@ -556,6 +137,10 @@ function clearWinnerAutoTimer(): void {
   winnerAutoAdvanceTimeoutId = null;
 }
 
+/**
+ * Clears Winner Click Handler and related transient state.
+ * @returns No return value; this function works via side effects.
+ */
 function clearWinnerClickHandler(): void {
   if (!winnerClickCleanup) {
     return;
@@ -565,6 +150,10 @@ function clearWinnerClickHandler(): void {
   winnerClickCleanup = null;
 }
 
+/**
+ * Clears Winner Flow and related transient state.
+ * @returns No return value; this function works via side effects.
+ */
 function clearWinnerFlow(): void {
   winnerCanContinue = false;
   clearWinnerContinueTimer();
@@ -572,6 +161,10 @@ function clearWinnerFlow(): void {
   clearWinnerClickHandler();
 }
 
+/**
+ * Executes Reveal Winner Continue Hint for the current flow.
+ * @returns No return value; this function works via side effects.
+ */
 function revealWinnerContinueHint(): void {
   const winnerContinueElement = getWinnerContinueElement();
   if (winnerContinueElement) {
@@ -581,16 +174,34 @@ function revealWinnerContinueHint(): void {
   winnerCanContinue = true;
 }
 
+/**
+ * Renders Game Over Screen into the UI.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
 function renderGameOverScreen(state: MemoryGameState): void {
-  const gameOverData = createGameOverRenderData(state);
-  renderScreenWithTransition({ screen: "gameOver", data: gameOverData });
+  const nextScreenState: ScreenRenderState = {
+    screen: "gameOver",
+    data: createGameOverRenderData(state),
+  };
+  renderScreenWithTransition(nextScreenState);
 }
 
+/**
+ * Advances Winner To Game Over to the next step.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
 function advanceWinnerToGameOver(state: MemoryGameState): void {
   clearWinnerFlow();
   renderGameOverScreen(state);
 }
 
+/**
+ * Binds event handlers for Winner Click Advance.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
 function bindWinnerClickAdvance(state: MemoryGameState): void {
   const winnerScreenElement = getWinnerScreenElement();
   if (!winnerScreenElement) {
@@ -609,6 +220,11 @@ function bindWinnerClickAdvance(state: MemoryGameState): void {
   winnerClickCleanup = () => winnerScreenElement.removeEventListener("click", onWinnerClick);
 }
 
+/**
+ * Starts Winner Progression flow.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
 function startWinnerProgression(state: MemoryGameState): void {
   clearWinnerFlow();
   bindWinnerClickAdvance(state);
@@ -616,323 +232,72 @@ function startWinnerProgression(state: MemoryGameState): void {
   winnerAutoAdvanceTimeoutId = window.setTimeout(() => advanceWinnerToGameOver(state), WINNER_AUTO_ADVANCE_MS);
 }
 
-function renderWinnerScreen(state: MemoryGameState): void {
+/**
+ * Determines whether the next screen should be `winner` or `draw`.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns Value of type `ScreenRenderState`.
+ */
+function getWinnerScreenState(state: MemoryGameState): ScreenRenderState {
   if (hasDraw(state)) {
-    renderScreenWithTransition({ screen: "draw", data: createDrawRenderData(state.settings) });
-    window.setTimeout(() => startWinnerProgression(state), WINNER_FLOW_INIT_DELAY_MS);
-    return;
+    return {
+      screen: "draw",
+      data: createDrawRenderData(state.settings),
+    };
   }
 
-  renderScreenWithTransition({ screen: "winner", data: createWinnerRenderData(state) });
+  return {
+    screen: "winner",
+    data: createWinnerRenderData(state),
+  };
+}
+
+/**
+ * Renders Winner Screen into the UI.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
+function renderWinnerScreen(state: MemoryGameState): void {
+  renderScreenWithTransition(getWinnerScreenState(state));
   window.setTimeout(() => startWinnerProgression(state), WINNER_FLOW_INIT_DELAY_MS);
 }
 
-function getCardElementById(cardId: string): HTMLButtonElement | null {
-  return document.querySelector<HTMLButtonElement>(`[data-memory-card-id="${cardId}"]`);
-}
-
-function getCardElementFromEvent(event: MouseEvent): HTMLButtonElement | null {
-  if (!(event.target instanceof HTMLElement)) {
-    return null;
-  }
-
-  return event.target.closest<HTMLButtonElement>("[data-memory-card-id]");
-}
-
-function getCardId(cardElement: HTMLButtonElement): string | null {
-  return cardElement.dataset.memoryCardId ?? null;
-}
-
-function getCardPairId(cardElement: HTMLButtonElement): string | null {
-  return cardElement.dataset.memoryCardPair ?? null;
-}
-
-function setCardFlipped(cardElement: HTMLButtonElement, isFlipped: boolean): void {
-  cardElement.classList.toggle("is-flipped", isFlipped);
-}
-
-function setCardMatched(cardElement: HTMLButtonElement): void {
-  cardElement.classList.add("is-matched");
-}
-
-function setCardCollected(cardElement: HTMLButtonElement): void {
-  cardElement.classList.add("is-collected");
-  cardElement.disabled = true;
-}
-
-function getPlayerStackElement(player: PlayerColor): HTMLElement | null {
-  return document.querySelector<HTMLElement>(`[data-player-stack="${player}"]`);
-}
-
-function createCollectedCard(faceSrc: string, player: PlayerColor): HTMLImageElement {
-  const collectedCardElement = document.createElement("img");
-  collectedCardElement.className = `game__collected-card game__collected-card--${player}`;
-  collectedCardElement.src = faceSrc;
-  collectedCardElement.alt = "";
-  collectedCardElement.setAttribute("aria-hidden", "true");
-  return collectedCardElement;
-}
-
-function getStackPileIndex(cardCount: number): number {
-  return Math.floor(cardCount / STACK_PILE_CARD_LIMIT);
-}
-
-function getStackPileElement(stackElement: HTMLElement, pileIndex: number): HTMLElement {
-  const selector = `[data-player-pile="${pileIndex}"]`;
-  const existingPileElement = stackElement.querySelector<HTMLElement>(selector);
-  if (existingPileElement) {
-    return existingPileElement;
-  }
-
-  const nextPileElement = document.createElement("div");
-  nextPileElement.className = "game__player-pile";
-  nextPileElement.dataset.playerPile = String(pileIndex);
-  stackElement.append(nextPileElement);
-  return nextPileElement;
-}
-
-function appendCollectedCardToStack(stackElement: HTMLElement, collectedCardElement: HTMLImageElement): void {
-  const collectedCardCount = stackElement.querySelectorAll(".game__collected-card").length;
-  const pileIndex = getStackPileIndex(collectedCardCount);
-  const pileElement = getStackPileElement(stackElement, pileIndex);
-  pileElement.append(collectedCardElement);
-}
-
-function createFlyingGhost(cardElement: HTMLButtonElement): HTMLElement {
-  const cardRect = cardElement.getBoundingClientRect();
-  const ghostElement = cardElement.cloneNode(true) as HTMLElement;
-  ghostElement.classList.add("memory-card-ghost");
-  ghostElement.classList.remove("is-collected");
-  ghostElement.style.left = `${cardRect.left}px`;
-  ghostElement.style.top = `${cardRect.top}px`;
-  ghostElement.style.width = `${cardRect.width}px`;
-  ghostElement.style.height = `${cardRect.height}px`;
-  return ghostElement;
-}
-
-function animateCardGhostToTarget(ghostElement: HTMLElement, targetElement: HTMLElement): Promise<void> {
-  const sourceRect = ghostElement.getBoundingClientRect();
-  const targetRect = targetElement.getBoundingClientRect();
-  const deltaX = targetRect.left - sourceRect.left;
-  const deltaY = targetRect.top - sourceRect.top;
-
-  return new Promise((resolve) => {
-    let isFinished = false;
-    const finish = () => {
-      if (isFinished) {
-        return;
-      }
-
-      isFinished = true;
-      resolve();
-    };
-
-    ghostElement.addEventListener("transitionend", finish, { once: true });
-    window.setTimeout(finish, CARD_FLY_DURATION_MS + 120);
-
-    requestAnimationFrame(() => {
-      ghostElement.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.55)`;
-      ghostElement.style.opacity = "0.75";
-    });
-  });
-}
-
-function collectMatchedCard(cardElement: HTMLButtonElement, cardData: MemoryCardData, player: PlayerColor): Promise<void> {
-  const stackElement = getPlayerStackElement(player);
-  if (!stackElement) {
-    setCardCollected(cardElement);
-    return Promise.resolve();
-  }
-
-  const collectedCardElement = createCollectedCard(cardData.faceSrc, player);
-  collectedCardElement.style.visibility = "hidden";
-  appendCollectedCardToStack(stackElement, collectedCardElement);
-
-  const ghostElement = createFlyingGhost(cardElement);
-  document.body.append(ghostElement);
-
-  return animateCardGhostToTarget(ghostElement, collectedCardElement).then(() => {
-    setCardCollected(cardElement);
-    collectedCardElement.style.visibility = "visible";
-    ghostElement.remove();
-  });
-}
-
-function switchPlayer(state: MemoryGameState): void {
-  state.currentPlayer = state.currentPlayer === "blue" ? "orange" : "blue";
-}
-
-function resetRevealedCards(state: MemoryGameState): void {
-  state.revealedCardIds = [];
-}
-
-function cardPairMatches(state: MemoryGameState): boolean {
-  const [firstCardId, secondCardId] = state.revealedCardIds;
-  const firstCard = state.cardsById.get(firstCardId);
-  const secondCard = state.cardsById.get(secondCardId);
-  return Boolean(firstCard && secondCard && firstCard.pairId === secondCard.pairId);
-}
-
-function handleMismatchedCards(state: MemoryGameState): void {
-  const [firstCardId, secondCardId] = state.revealedCardIds;
-  window.setTimeout(() => {
-    const firstCardElement = getCardElementById(firstCardId);
-    const secondCardElement = getCardElementById(secondCardId);
-    if (firstCardElement) {
-      setCardFlipped(firstCardElement, false);
-    }
-
-    if (secondCardElement) {
-      setCardFlipped(secondCardElement, false);
-    }
-
-    resetRevealedCards(state);
-    switchPlayer(state);
-    renderCurrentPlayer(state);
-    state.isBoardLocked = false;
-  }, MISMATCH_FLIP_DELAY_MS);
-}
-
-function getRevealedCardElements(state: MemoryGameState): [HTMLButtonElement | null, HTMLButtonElement | null] {
-  const [firstCardId, secondCardId] = state.revealedCardIds;
-  return [getCardElementById(firstCardId), getCardElementById(secondCardId)];
-}
-
-function getRevealedCardData(state: MemoryGameState): [MemoryCardData | undefined, MemoryCardData | undefined] {
-  const [firstCardId, secondCardId] = state.revealedCardIds;
-  return [state.cardsById.get(firstCardId), state.cardsById.get(secondCardId)];
-}
-
-function handleMatchedCards(state: MemoryGameState): void {
-  const [firstCardData, secondCardData] = getRevealedCardData(state);
-  if (!firstCardData || !secondCardData) {
-    resetRevealedCards(state);
-    state.isBoardLocked = false;
-    return;
-  }
-
-  const [firstCardElement, secondCardElement] = getRevealedCardElements(state);
-  if (!firstCardElement || !secondCardElement) {
-    resetRevealedCards(state);
-    state.isBoardLocked = false;
-    return;
-  }
-
-  setCardMatched(firstCardElement);
-  setCardMatched(secondCardElement);
-  state.matchedPairIds.add(firstCardData.pairId);
-  state.scores[state.currentPlayer] += 1;
+/**
+ * Initializes Ialize Memory Game for first use.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
+function initializeMemoryGame(state: MemoryGameState): void {
+  memoryGameState = state;
   renderScores(state);
-
-  window.setTimeout(() => {
-    Promise.all([
-      collectMatchedCard(firstCardElement, firstCardData, state.currentPlayer),
-      collectMatchedCard(secondCardElement, secondCardData, state.currentPlayer),
-    ]).then(() => {
-      resetRevealedCards(state);
-      if (isGameFinished(state)) {
-        renderWinnerScreen(state);
-        return;
-      }
-
-      state.isBoardLocked = false;
-    });
-  }, MATCH_COLLECT_DELAY_MS);
+  renderCurrentPlayer(state);
 }
 
-function isCardAlreadySelected(state: MemoryGameState, cardId: string): boolean {
-  return state.revealedCardIds.includes(cardId);
+/**
+ * Binds event handlers for Gameplay.
+ * @param state Mutable in-memory game state for the current match.
+ * @returns No return value; this function works via side effects.
+ */
+function bindGameplay(state: MemoryGameState): void {
+  bindBoardActions(state, {
+    onScoresChanged: renderScores,
+    onCurrentPlayerChanged: renderCurrentPlayer,
+    onGameFinished: renderWinnerScreen,
+  });
 }
 
-function isCardAlreadyMatched(state: MemoryGameState, pairId: string): boolean {
-  return state.matchedPairIds.has(pairId);
-}
-
-function canSelectCard(
-  state: MemoryGameState,
-  cardElement: HTMLButtonElement,
-  cardId: string,
-  pairId: string
-): boolean {
-  if (state.isBoardLocked) {
-    return false;
-  }
-
-  if (isCardAlreadySelected(state, cardId)) {
-    return false;
-  }
-
-  if (isCardAlreadyMatched(state, pairId)) {
-    return false;
-  }
-
-  return !cardElement.classList.contains("is-collected");
-}
-
-function onCardSelected(state: MemoryGameState, cardElement: HTMLButtonElement, cardId: string): void {
-  setCardFlipped(cardElement, true);
-  state.revealedCardIds.push(cardId);
-  if (state.revealedCardIds.length < 2) {
-    return;
-  }
-
-  state.isBoardLocked = true;
-  if (cardPairMatches(state)) {
-    handleMatchedCards(state);
-    return;
-  }
-
-  handleMismatchedCards(state);
-}
-
-function onBoardClick(event: MouseEvent): void {
-  const state = memoryGameState;
-  if (!state) {
-    return;
-  }
-
-  const cardElement = getCardElementFromEvent(event);
-  if (!cardElement) {
-    return;
-  }
-
-  const cardId = getCardId(cardElement);
-  const pairId = getCardPairId(cardElement);
-  if (!cardId || !pairId) {
-    return;
-  }
-
-  if (!canSelectCard(state, cardElement, cardId, pairId)) {
-    return;
-  }
-
-  onCardSelected(state, cardElement, cardId);
-}
-
-function bindBoardActions(): void {
-  const boardElement = getBoardElement();
-  if (!boardElement) {
-    return;
-  }
-
-  boardElement.addEventListener("click", onBoardClick);
-}
-
-function initializeMemoryGame(settings: GameSettings, deck: MemoryCardData[]): void {
-  memoryGameState = createMemoryGameState(settings, deck);
-  renderScores(memoryGameState);
-  renderCurrentPlayer(memoryGameState);
-}
-
+/**
+ * Initializes Game Page for first use.
+ * @returns No return value; this function works via side effects.
+ */
 function initGamePage(): void {
   clearWinnerFlow();
   const settings = readGameSettings();
-  const layoutAssets = getGameLayoutAssets(settings);
   applyGameTheme(settings.theme);
-  renderScreen({ screen: "game", data: layoutAssets });
+  renderScreen({ screen: "game", data: getGameLayoutAssets(settings) });
   const deck = renderMemoryBoard(settings);
-  initializeMemoryGame(settings, deck);
-  bindBoardActions();
+  const gameState = createMemoryGameState(settings, deck);
+  initializeMemoryGame(gameState);
+  bindGameplay(gameState);
   bindExitActions();
   bindGamePageActions();
 }
@@ -942,3 +307,4 @@ if (document.readyState === "loading") {
 } else {
   initGamePage();
 }
+

@@ -27,10 +27,20 @@ const exitOverlayCopyByTheme: Record<GameTheme, ExitOverlayCopy> = {
   },
 };
 
+/**
+ * Returns Exit Overlay Copy from the current DOM/state context.
+ * @param theme Active game theme key.
+ * @returns Value of type `ExitOverlayCopy`.
+ */
 export function getExitOverlayCopy(theme: GameTheme): ExitOverlayCopy {
   return exitOverlayCopyByTheme[theme];
 }
 
+/**
+ * Executes Exit Overlay Template for the current flow.
+ * @param copy Theme-specific copy texts for the exit overlay.
+ * @returns Generated string value for rendering or downstream processing.
+ */
 export function exitOverlayTemplate(copy: ExitOverlayCopy): string {
   return /*html*/ `
     <section class="game__exit-overlay" id="game-exit-overlay" data-game-exit-overlay hidden>
@@ -45,10 +55,18 @@ export function exitOverlayTemplate(copy: ExitOverlayCopy): string {
     </section>`;
 }
 
+/**
+ * Returns Exit Overlay from the current DOM/state context.
+ * @returns Resolved `HTMLElement`, or `null` when no matching element can be resolved.
+ */
 function getExitOverlay(): HTMLElement | null {
   return document.querySelector<HTMLElement>("[data-game-exit-overlay]");
 }
 
+/**
+ * Clears Exit Overlay Hide Timer and related transient state.
+ * @returns No return value; this function works via side effects.
+ */
 function clearExitOverlayHideTimer(): void {
   if (exitOverlayHideTimerId === null) {
     return;
@@ -58,21 +76,40 @@ function clearExitOverlayHideTimer(): void {
   exitOverlayHideTimerId = null;
 }
 
+/**
+ * Returns Overlay Close Delay from the current DOM/state context.
+ * @returns Computed numeric value.
+ */
 function getOverlayCloseDelay(): number {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : EXIT_OVERLAY_CLOSE_MS;
 }
 
+/**
+ * Executes Hide Overlay Immediately for the current flow.
+ * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @returns No return value; this function works via side effects.
+ */
 function hideOverlayImmediately(overlay: HTMLElement): void {
   overlay.hidden = true;
   overlay.classList.remove(EXIT_OVERLAY_CLOSING_CLASS);
 }
 
+/**
+ * Executes Show Overlay for the current flow.
+ * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @returns No return value; this function works via side effects.
+ */
 function showOverlay(overlay: HTMLElement): void {
   clearExitOverlayHideTimer();
   overlay.classList.remove(EXIT_OVERLAY_CLOSING_CLASS);
   overlay.hidden = false;
 }
 
+/**
+ * Executes Hide Overlay With Animation for the current flow.
+ * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @returns No return value; this function works via side effects.
+ */
 function hideOverlayWithAnimation(overlay: HTMLElement): void {
   if (overlay.hidden) {
     return;
@@ -92,6 +129,11 @@ function hideOverlayWithAnimation(overlay: HTMLElement): void {
   }, closeDelay);
 }
 
+/**
+ * Updates Exit Overlay Visibility on the target element or state.
+ * @param isVisible Controls whether the overlay should be visible.
+ * @returns No return value; this function works via side effects.
+ */
 function setExitOverlayVisibility(isVisible: boolean): void {
   const overlay = getExitOverlay();
   if (!overlay) {
@@ -106,6 +148,11 @@ function setExitOverlayVisibility(isVisible: boolean): void {
   hideOverlayWithAnimation(overlay);
 }
 
+/**
+ * Returns Action Element from the current DOM/state context.
+ * @param target Original event target used for DOM lookup.
+ * @returns Resolved `HTMLElement`, or `null` when no matching element can be resolved.
+ */
 function getActionElement(target: EventTarget | null): HTMLElement | null {
   if (!(target instanceof HTMLElement)) {
     return null;
@@ -114,6 +161,12 @@ function getActionElement(target: EventTarget | null): HTMLElement | null {
   return target.closest<HTMLElement>("[data-action]");
 }
 
+/**
+ * Handles Exit Overlay Action and triggers follow-up actions.
+ * @param action Action name read from a `data-action` attribute.
+ * @param onExitGame Callback executed when the game should be exited.
+ * @returns No return value; this function works via side effects.
+ */
 function handleExitOverlayAction(action: string, onExitGame: () => void): void {
   if (action === "open-exit-overlay") {
     setExitOverlayVisibility(true);
@@ -130,6 +183,12 @@ function handleExitOverlayAction(action: string, onExitGame: () => void): void {
   }
 }
 
+/**
+ * Handles events for Exit Overlay Click.
+ * @param event DOM event triggered by the current user interaction.
+ * @param onExitGame Callback executed when the game should be exited.
+ * @returns No return value; this function works via side effects.
+ */
 function onExitOverlayClick(event: MouseEvent, onExitGame: () => void): void {
   const actionElement = getActionElement(event.target);
   if (!actionElement) {
@@ -144,6 +203,12 @@ function onExitOverlayClick(event: MouseEvent, onExitGame: () => void): void {
   handleExitOverlayAction(action, onExitGame);
 }
 
+/**
+ * Binds event handlers for Exit Overlay Actions.
+ * @param rootElement DOM-Element, das in diesem Schritt gelesen oder aktualisiert wird.
+ * @param onExitGame Callback executed when the game should be exited.
+ * @returns No return value; this function works via side effects.
+ */
 export function bindExitOverlayActions(rootElement: HTMLElement, onExitGame: () => void): void {
   rootElement.addEventListener("click", (event: MouseEvent) => onExitOverlayClick(event, onExitGame));
 }
