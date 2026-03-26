@@ -4,7 +4,7 @@
   z-index: 1000;
   display: grid;
   place-items: center;
-  padding: 1.5rem;
+  padding: var(--exit-overlay-padding, 1.5rem);
 }
 
 .game__exit-overlay[hidden] {
@@ -33,38 +33,60 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--exit-overlay-backdrop-bg, rgba(0, 0, 0, 0.55));
 }
 
 .game__exit-dialog {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: var(--exit-dialog-justify, space-around);
   position: relative;
-  width: min(40rem, 100%);
-  aspect-ratio: 2 / 1;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  background: var(--game-exit-surface, #ffffff);
-  color: var(--game-exit-text, #1f1f1f);
-  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
+  width: var(--exit-dialog-width, min(40rem, 100%));
+  aspect-ratio: var(--exit-dialog-aspect-ratio, 2 / 1);
+  min-height: var(--exit-dialog-min-height, auto);
+  border-radius: var(--exit-dialog-radius, 1rem);
+  padding: var(--exit-dialog-padding, 1.5rem);
+  background: var(--exit-dialog-bg, var(--game-exit-surface, #ffffff));
+  color: var(--exit-dialog-color, var(--game-exit-text, #1f1f1f));
+  font-family: var(--exit-dialog-font-family, inherit);
+  font-weight: var(--exit-dialog-font-weight, inherit);
+  box-shadow: var(--exit-dialog-shadow, 0 1rem 2rem rgba(0, 0, 0, 0.28));
 }
 
 .game__exit-title {
-  text-align: center;
-  margin: 0 0 1rem;
-  font-size: 2rem;
-  line-height: 1.2;
+  text-align: var(--exit-title-align, center);
+  margin: var(--exit-title-margin, 0 0 1rem);
+  font-family: var(--exit-title-font-family, inherit);
+  font-size: var(--exit-title-font-size, 2rem);
+  font-weight: var(--exit-title-font-weight, inherit);
+  line-height: var(--exit-title-line-height, 1.2);
+  letter-spacing: var(--exit-title-letter-spacing, normal);
 }
 
 .game__exit-actions {
   display: flex;
-  justify-content: space-around;
+  flex-direction: var(--exit-actions-direction, row);
+  align-items: var(--exit-actions-align, stretch);
+  justify-content: var(--exit-actions-justify, space-around);
+  gap: var(--exit-actions-gap, 0);
+  margin-top: var(--exit-actions-margin-top, 0);
 }
 
 .game__exit-continue,
 .game__exit-confirm {
-  font-size: 1.25rem;
+  text-align: center;
+  justify-content: var(--exit-action-justify, center);
+  gap: var(--exit-action-gap, 0);
+  width: var(--exit-action-width, auto);
+  min-height: var(--exit-action-min-height, auto);
+  border-radius: var(--exit-action-radius, 0);
+  padding: var(--exit-action-padding, 0);
+  font-family: var(--exit-action-font-family, inherit);
+  font-size: var(--exit-action-font-size, 1.25rem);
+  font-weight: var(--exit-action-font-weight, inherit);
+  line-height: var(--exit-action-line-height, 1);
+  text-wrap: var(--exit-action-text-wrap, wrap);
+  transition: var(--exit-action-transition, transform 0.2s ease, box-shadow 0.2s ease);
 }
 
 @keyframes game-exit-backdrop-enter {

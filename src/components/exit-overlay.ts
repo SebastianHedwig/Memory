@@ -22,8 +22,8 @@ const exitOverlayCopyByTheme: Record<GameTheme, ExitOverlayCopy> = {
   },
   foods: {
     title: "Are you sure you want to quit the game?",
-    continueLabel: "No, back to game",
-    confirmLabel: "Exit game",
+    continueLabel: "NO, BACK TO game",
+    confirmLabel: "EXIT game",
   },
 };
 

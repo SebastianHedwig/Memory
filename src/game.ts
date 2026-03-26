@@ -1,7 +1,7 @@
 import "@scss/main.scss";
 import { bindExitOverlayActions, getExitOverlayCopy, type ExitOverlayCopy } from "./components/exit-overlay";
 import { memoryCardTemplate, type MemoryCardData } from "./components/memory-card";
-import { gameLayoutTemplate, gameOverTemplate, winnerTemplate } from "./game.templates";
+import { drawTemplate, gameLayoutTemplate, gameOverTemplate, winnerTemplate } from "./game.templates";
 import { readGameSettings, type GameSettings } from "./shared/_game-settings";
 import { navigateTo } from "./shared/_navigation";
 
@@ -10,8 +10,10 @@ type PlayerColor = "blue" | "orange";
 type WinnerRenderData = {
   confettiSrc: string;
   playerName: string;
+  playerColor: PlayerColor;
   playerImageSrc: string;
   playerImageAlt: string;
+  pedestalLabel?: string;
 };
 
 type GameOverRenderData = {
@@ -21,9 +23,14 @@ type GameOverRenderData = {
   orangeScore: number;
 };
 
+type DrawRenderData = {
+  confettiSrc: string;
+};
+
 type ScreenRenderState =
   | { screen: "game"; data: GameLayoutAssets }
   | { screen: "winner"; data: WinnerRenderData }
+  | { screen: "draw"; data: DrawRenderData }
   | { screen: "gameOver"; data: GameOverRenderData };
 
 interface GameLayoutAssets {
@@ -31,6 +38,7 @@ interface GameLayoutAssets {
   orangeIconSrc: string;
   currentPlayerIconSrc: string;
   exitButtonIconSrc: string;
+  exitButtonLabel: string;
   exitOverlayCopy: ExitOverlayCopy;
 }
 
@@ -71,8 +79,18 @@ const MATCH_COLLECT_DELAY_MS = MATCH_BORDER_DRAW_MS + MATCH_BORDER_HOLD_MS;
 const MISMATCH_FLIP_DELAY_MS = 700;
 const CARD_FLY_DURATION_MS = 760;
 const STACK_PILE_CARD_LIMIT = 16;
+const SCREEN_LEAVE_ANIMATION_MS = 260;
+const WINNER_CONTINUE_UNLOCK_MS = 2000;
+const WINNER_AUTO_ADVANCE_MS = 10000;
+const WINNER_FLOW_INIT_DELAY_MS = SCREEN_LEAVE_ANIMATION_MS + 40;
+
+const WINNER_ASSET_THEME = "code-vibes";
 
 let memoryGameState: MemoryGameState | null = null;
+let winnerCanContinue = false;
+let winnerContinueTimeoutId: number | null = null;
+let winnerAutoAdvanceTimeoutId: number | null = null;
+let winnerClickCleanup: (() => void) | null = null;
 
 function getThemeAssetsFolder(theme: GameSettings["theme"]): string {
   return themeFolderByValue[theme];
@@ -98,6 +116,14 @@ function getInitialCurrentPlayerIcon(settings: GameSettings, blueIconSrc: string
   return getStaticCurrentPlayerIcon(settings);
 }
 
+function getExitButtonLabel(theme: GameSettings["theme"]): string {
+  if (theme === "foods") {
+    return "EXIT game";
+  }
+
+  return "Exit game";
+}
+
 function getGameLayoutAssets(settings: GameSettings): GameLayoutAssets {
   const themeFolder = getThemeAssetsFolder(settings.theme);
   const blueIconSrc = createThemeAssetPath(themeFolder, "player-icon-blue.png");
@@ -109,6 +135,7 @@ function getGameLayoutAssets(settings: GameSettings): GameLayoutAssets {
     orangeIconSrc,
     currentPlayerIconSrc: getInitialCurrentPlayerIcon(settings, blueIconSrc, orangeIconSrc),
     exitButtonIconSrc,
+    exitButtonLabel: getExitButtonLabel(settings.theme),
     exitOverlayCopy: getExitOverlayCopy(settings.theme),
   };
 }
@@ -123,6 +150,15 @@ function getPlayerIconSources(settings: GameSettings): Record<PlayerColor, strin
 
 function applyGameTheme(theme: GameSettings["theme"]): void {
   document.body.dataset.theme = theme;
+}
+
+function applyScreenState(screen: ScreenRenderState["screen"]): void {
+  if (screen === "gameOver") {
+    document.body.dataset.screen = "game-over";
+    return;
+  }
+
+  document.body.dataset.screen = screen;
 }
 
 function getBoardElement(): HTMLElement | null {
@@ -233,7 +269,51 @@ function bindExitActions(): void {
   bindExitOverlayActions(appElement, () => navigateTo("home"));
 }
 
+function getActionTarget(target: EventTarget | null): HTMLElement | null {
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  return target.closest<HTMLElement>("[data-action]");
+}
+
+function getActionValue(target: EventTarget | null): string | null {
+  const actionTarget = getActionTarget(target);
+  return actionTarget?.dataset.action ?? null;
+}
+
+function handleGamePageAction(action: string): void {
+  if (action === "play-again") {
+    navigateTo("settings");
+    return;
+  }
+
+  if (action === "exit-game") {
+    navigateTo("home");
+  }
+}
+
+function onGamePageClick(event: MouseEvent): void {
+  const action = getActionValue(event.target);
+  if (!action) {
+    return;
+  }
+
+  handleGamePageAction(action);
+}
+
+function bindGamePageActions(): void {
+  const appElement = getAppElement();
+  if (!appElement) {
+    return;
+  }
+
+  appElement.addEventListener("click", onGamePageClick);
+}
+
 function renderScreen(state: ScreenRenderState): void {
+  applyScreenState(state.screen);
+
   switch (state.screen) {
     case "game":
       renderApp(gameLayoutTemplate(state.data));
@@ -241,12 +321,55 @@ function renderScreen(state: ScreenRenderState): void {
     case "winner":
       renderApp(winnerTemplate(state.data));
       return;
+    case "draw":
+      renderApp(drawTemplate(state.data));
+      return;
     case "gameOver":
       renderApp(gameOverTemplate(state.data));
       return;
     default:
       return;
   }
+}
+
+function getCurrentScreenElement(): HTMLElement | null {
+  const appElement = getAppElement();
+  if (!appElement) {
+    return null;
+  }
+
+  return appElement.firstElementChild instanceof HTMLElement ? appElement.firstElementChild : null;
+}
+
+function prepareEnteringScreen(element: HTMLElement): void {
+  element.classList.add("screen-transition-enter");
+  requestAnimationFrame(() => {
+    element.classList.add("is-visible");
+  });
+}
+
+function renderScreenWithTransition(state: ScreenRenderState): void {
+  const currentScreenElement = getCurrentScreenElement();
+  if (!currentScreenElement) {
+    renderScreen(state);
+    const nextScreenElement = getCurrentScreenElement();
+    if (nextScreenElement) {
+      prepareEnteringScreen(nextScreenElement);
+    }
+
+    return;
+  }
+
+  currentScreenElement.classList.add("screen-transition-leave");
+  window.setTimeout(() => {
+    renderScreen(state);
+    const nextScreenElement = getCurrentScreenElement();
+    if (!nextScreenElement) {
+      return;
+    }
+
+    prepareEnteringScreen(nextScreenElement);
+  }, SCREEN_LEAVE_ANIMATION_MS);
 }
 
 function createScores(): Record<PlayerColor, number> {
@@ -322,6 +445,186 @@ function renderCurrentPlayer(state: MemoryGameState): void {
   if (currentPlayerBadgeElement) {
     currentPlayerBadgeElement.dataset.player = state.currentPlayer;
   }
+}
+
+function getWinnerPlayer(state: MemoryGameState): PlayerColor {
+  if (state.scores.blue > state.scores.orange) {
+    return "blue";
+  }
+
+  if (state.scores.orange > state.scores.blue) {
+    return "orange";
+  }
+
+  return state.currentPlayer;
+}
+
+function getWinnerPlayerName(player: PlayerColor): string {
+  return player === "blue" ? "BLUE PLAYER" : "ORANGE PLAYER";
+}
+
+function getGamingWinnerPlayerName(player: PlayerColor): string {
+  return player === "blue" ? "Blue Player" : "Orange Player";
+}
+
+function getWinnerPlayerImageAlt(player: PlayerColor): string {
+  return player === "blue" ? "Blue player winner icon" : "Orange player winner icon";
+}
+
+function getWinnerConfettiSource(theme: GameSettings["theme"]): string {
+  if (theme === "gaming" || theme === "foods") {
+    return "";
+  }
+
+  return createThemeAssetPath(getThemeAssetsFolder(WINNER_ASSET_THEME), "confetti.png");
+}
+
+function createWinnerRenderData(state: MemoryGameState): WinnerRenderData {
+  if (state.settings.theme === "gaming") {
+    const winnerPlayer = getWinnerPlayer(state);
+    const themeFolder = getThemeAssetsFolder(state.settings.theme);
+    return {
+      confettiSrc: "",
+      playerName: getGamingWinnerPlayerName(winnerPlayer),
+      playerColor: winnerPlayer,
+      playerImageSrc: createThemeAssetPath(themeFolder, "winner-pot.png"),
+      playerImageAlt: "Winner trophy",
+      pedestalLabel: winnerPlayer === "blue" ? "BLUE" : "ORANGE",
+    };
+  }
+
+  const winnerPlayer = getWinnerPlayer(state);
+  const winnerThemeFolder = getThemeAssetsFolder(WINNER_ASSET_THEME);
+  const winnerPlayerImageName =
+    winnerPlayer === "blue" ? "player-icon-blue-large.png" : "player-icon-orange-large.png";
+
+  return {
+    confettiSrc: getWinnerConfettiSource(state.settings.theme),
+    playerName: getWinnerPlayerName(winnerPlayer),
+    playerColor: winnerPlayer,
+    playerImageSrc: createThemeAssetPath(winnerThemeFolder, winnerPlayerImageName),
+    playerImageAlt: getWinnerPlayerImageAlt(winnerPlayer),
+  };
+}
+
+function createDrawRenderData(settings: GameSettings): DrawRenderData {
+  return {
+    confettiSrc: getWinnerConfettiSource(settings.theme),
+  };
+}
+
+function createGameOverRenderData(state: MemoryGameState): GameOverRenderData {
+  return {
+    blueIconSrc: state.playerIconSources.blue,
+    blueScore: state.scores.blue,
+    orangeIconSrc: state.playerIconSources.orange,
+    orangeScore: state.scores.orange,
+  };
+}
+
+function isGameFinished(state: MemoryGameState): boolean {
+  return state.matchedPairIds.size >= state.totalPairs;
+}
+
+function hasDraw(state: MemoryGameState): boolean {
+  return state.scores.blue === state.scores.orange;
+}
+
+function getWinnerScreenElement(): HTMLElement | null {
+  return document.querySelector<HTMLElement>("[data-winner-screen]");
+}
+
+function getWinnerContinueElement(): HTMLElement | null {
+  return document.querySelector<HTMLElement>("[data-winner-continue]");
+}
+
+function clearWinnerContinueTimer(): void {
+  if (winnerContinueTimeoutId === null) {
+    return;
+  }
+
+  window.clearTimeout(winnerContinueTimeoutId);
+  winnerContinueTimeoutId = null;
+}
+
+function clearWinnerAutoTimer(): void {
+  if (winnerAutoAdvanceTimeoutId === null) {
+    return;
+  }
+
+  window.clearTimeout(winnerAutoAdvanceTimeoutId);
+  winnerAutoAdvanceTimeoutId = null;
+}
+
+function clearWinnerClickHandler(): void {
+  if (!winnerClickCleanup) {
+    return;
+  }
+
+  winnerClickCleanup();
+  winnerClickCleanup = null;
+}
+
+function clearWinnerFlow(): void {
+  winnerCanContinue = false;
+  clearWinnerContinueTimer();
+  clearWinnerAutoTimer();
+  clearWinnerClickHandler();
+}
+
+function revealWinnerContinueHint(): void {
+  const winnerContinueElement = getWinnerContinueElement();
+  if (winnerContinueElement) {
+    winnerContinueElement.classList.remove("winner__continue--pending");
+  }
+
+  winnerCanContinue = true;
+}
+
+function renderGameOverScreen(state: MemoryGameState): void {
+  const gameOverData = createGameOverRenderData(state);
+  renderScreenWithTransition({ screen: "gameOver", data: gameOverData });
+}
+
+function advanceWinnerToGameOver(state: MemoryGameState): void {
+  clearWinnerFlow();
+  renderGameOverScreen(state);
+}
+
+function bindWinnerClickAdvance(state: MemoryGameState): void {
+  const winnerScreenElement = getWinnerScreenElement();
+  if (!winnerScreenElement) {
+    return;
+  }
+
+  const onWinnerClick = (): void => {
+    if (!winnerCanContinue) {
+      return;
+    }
+
+    advanceWinnerToGameOver(state);
+  };
+
+  winnerScreenElement.addEventListener("click", onWinnerClick);
+  winnerClickCleanup = () => winnerScreenElement.removeEventListener("click", onWinnerClick);
+}
+
+function startWinnerProgression(state: MemoryGameState): void {
+  clearWinnerFlow();
+  bindWinnerClickAdvance(state);
+  winnerContinueTimeoutId = window.setTimeout(revealWinnerContinueHint, WINNER_CONTINUE_UNLOCK_MS);
+  winnerAutoAdvanceTimeoutId = window.setTimeout(() => advanceWinnerToGameOver(state), WINNER_AUTO_ADVANCE_MS);
+}
+
+function renderWinnerScreen(state: MemoryGameState): void {
+  if (hasDraw(state)) {
+    renderScreenWithTransition({ screen: "draw", data: createDrawRenderData(state.settings) });
+    window.setTimeout(() => startWinnerProgression(state), WINNER_FLOW_INIT_DELAY_MS);
+    return;
+  }
+
+  renderScreenWithTransition({ screen: "winner", data: createWinnerRenderData(state) });
+  window.setTimeout(() => startWinnerProgression(state), WINNER_FLOW_INIT_DELAY_MS);
 }
 
 function getCardElementById(cardId: string): HTMLButtonElement | null {
@@ -527,6 +830,11 @@ function handleMatchedCards(state: MemoryGameState): void {
       collectMatchedCard(secondCardElement, secondCardData, state.currentPlayer),
     ]).then(() => {
       resetRevealedCards(state);
+      if (isGameFinished(state)) {
+        renderWinnerScreen(state);
+        return;
+      }
+
       state.isBoardLocked = false;
     });
   }, MATCH_COLLECT_DELAY_MS);
@@ -617,6 +925,7 @@ function initializeMemoryGame(settings: GameSettings, deck: MemoryCardData[]): v
 }
 
 function initGamePage(): void {
+  clearWinnerFlow();
   const settings = readGameSettings();
   const layoutAssets = getGameLayoutAssets(settings);
   applyGameTheme(settings.theme);
@@ -625,6 +934,7 @@ function initGamePage(): void {
   initializeMemoryGame(settings, deck);
   bindBoardActions();
   bindExitActions();
+  bindGamePageActions();
 }
 
 if (document.readyState === "loading") {

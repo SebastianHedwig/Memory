@@ -2,7 +2,7 @@
 
 .memory-card {
   position: relative;
-  width: var(--memory-card-size, 7.75rem);
+  width: var(--memory-card-size-current, var(--memory-card-size, 7.75rem));
   aspect-ratio: 1 / 1;
   border: 0;
   padding: 0;

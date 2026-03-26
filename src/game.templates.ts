@@ -5,6 +5,7 @@ interface GameLayoutTemplateData {
   orangeIconSrc: string;
   currentPlayerIconSrc: string;
   exitButtonIconSrc: string;
+  exitButtonLabel: string;
   exitOverlayCopy: ExitOverlayCopy;
 }
 
@@ -36,7 +37,7 @@ export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
             aria-haspopup="dialog"
             aria-controls="game-exit-overlay">
             <img class="game__exit-button-icon button__icon" src="${data.exitButtonIconSrc}" alt="" aria-hidden="true">
-            <span class="game__exit-button-label">Exit game</span>
+            <span class="game__exit-button-label">${data.exitButtonLabel}</span>
           </button>
         </div>
       </header>
@@ -52,18 +53,36 @@ export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
 type WinnerTemplateData = {
   confettiSrc: string;
   playerName: string;
+  playerColor: "blue" | "orange";
   playerImageSrc: string;
   playerImageAlt: string;
+  pedestalLabel?: string;
+};
+
+type DrawTemplateData = {
+  confettiSrc: string;
 };
 
 export function winnerTemplate(data: WinnerTemplateData): string {
   return /*html*/ `
-    <section class="winner">
-      <img class="winner__confetti-image" src="${data.confettiSrc}" alt="Bild mit viel Konfetti">
-      <span class="winner__title">The Winner is:</span>
-      <h2 class="winner__player">${data.playerName}</h2>
-      <img class="winner__player-img" src="${data.playerImageSrc}" alt="${data.playerImageAlt}">
-      <button class="winner__score-button button" type="button" data-action="go-to-score">Score</button>
+    <section class="winner" data-winner-screen>
+      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Bild mit viel Konfetti">` : ""}
+      <span class="winner__title">The winner is</span>
+      <h2 class="winner__player winner__player--${data.playerColor}">${data.playerName}</h2>
+      <div class="winner__player-media">
+        <img class="winner__player-img" src="${data.playerImageSrc}" alt="${data.playerImageAlt}">
+        ${data.pedestalLabel ? `<span class="winner__pedestal-label">${data.pedestalLabel}</span>` : ""}
+      </div>
+      <p class="winner__continue winner__continue--pending" data-winner-continue>Click to continue</p>
+    </section>`;
+}
+
+export function drawTemplate(data: DrawTemplateData): string {
+  return /*html*/ `
+    <section class="winner" data-winner-screen>
+      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Bild mit viel Konfetti">` : ""}
+      <h2 class="winner__draw-title">DRAW</h2>
+      <p class="winner__continue winner__continue--pending" data-winner-continue>Click to continue</p>
     </section>`;
 }
 
@@ -79,15 +98,21 @@ export function gameOverTemplate(data: GameOverTemplateData): string {
     <section class="game-over" aria-labelledby="game-over-title">
       <h1 class="game-over__title" id="game-over-title">Game Over</h1>
       <div class="game-over__score-box">
-        <span class="game-over__score-title">Final Score:</span>
+        <span class="game-over__score-title">Final score</span>
         <div class="game-over__scores">
           <div class="game-over__score game-over__score--blue">
             <img class="game-over__score-icon" src="${data.blueIconSrc}" alt="" aria-hidden="true">
-            <span class="game-over__score-value">${data.blueScore}</span>
+            <span class="game-over__score-value">
+              <span class="game-over__score-label">Blue</span>
+              <span class="game-over__score-number">${data.blueScore}</span>
+            </span>
           </div>
           <div class="game-over__score game-over__score--orange">
             <img class="game-over__score-icon" src="${data.orangeIconSrc}" alt="" aria-hidden="true">
-            <span class="game-over__score-value">${data.orangeScore}</span>
+            <span class="game-over__score-value">
+              <span class="game-over__score-label">Orange</span>
+              <span class="game-over__score-number">${data.orangeScore}</span>
+            </span>
           </div>
         </div>
         <div class="game-over__actions">

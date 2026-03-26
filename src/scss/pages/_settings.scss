@@ -1,7 +1,7 @@
 @use "../abstracts" as *;
 @use "../base/typography" as *;
 
-$settings-bg: rgb(255, 255, 255);
+$settings-bg: rgb(250, 245, 238);
 $settings-text: rgb(48, 49, 49);
 $settings-steps-bg: rgb(246, 246, 246);
 
@@ -23,6 +23,7 @@ $settings-steps-bg: rgb(246, 246, 246);
 
   &__header {
     margin-bottom: clamp(1.25rem, 3vw, 2rem);
+    padding-left: clamp(1rem, 2vw, 1.75rem);
   }
 
   &__title {
@@ -35,7 +36,7 @@ $settings-steps-bg: rgb(246, 246, 246);
   &__title-underline {
     width: 16rem;
     position: relative;
-    left: -1.5rem;
+    left: -0.85rem;
     top: -0.4rem;
   }
 
@@ -159,6 +160,8 @@ $settings-steps-bg: rgb(246, 246, 246);
     padding: 0.8rem 1rem;
     width: fit-content;
     background-color: $settings-steps-bg;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.18rem 0.55rem rgba(0, 0, 0, 0.08);
   }
 
   &__preview-card img  {
@@ -247,17 +250,163 @@ $settings-steps-bg: rgb(246, 246, 246);
 }
 
 @media (max-width: 64rem) {
-  .settings__content {
-    flex-direction: column;
-  }
-
   .settings {
+    &__content {
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
     &__preview {
       max-width: none;
     }
 
     &__steps-mount {
       align-self: flex-end;
+    }
+  }
+}
+
+@media (max-width: 48rem) {
+  .settings {
+    padding: 1.35rem 0 1rem;
+
+    &__layout {
+      width: min(72rem, 100% - 1.5rem);
+    }
+
+    &__title {
+      font-size: clamp(1.95rem, 7.6vw, 2.6rem);
+    }
+
+    &__title-underline {
+      width: 11.5rem;
+      left: -0.2rem;
+      top: -0.2rem;
+    }
+
+    &__group-title {
+      font-size: clamp(1.3rem, 5.2vw, 1.8rem);
+      margin-bottom: 0.65rem;
+    }
+
+    &__option-text {
+      font-size: clamp(1.05rem, 4.6vw, 1.4rem);
+    }
+
+    &__preview {
+      gap: 1.2rem;
+    }
+
+    &__steps-mount {
+      align-self: stretch;
+      width: 100%;
+      padding: 0.55rem 0.6rem;
+    }
+
+    &__steps {
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      min-height: auto;
+      gap: 0.45rem 0.6rem;
+      padding: 0.2rem;
+    }
+
+    &__step {
+      min-width: unset !important;
+      font-size: clamp(0.9rem, 3.8vw, 1.05rem);
+    }
+
+    &__separator {
+      width: 1.45rem;
+      height: 1.9rem;
+    }
+
+    &__start-button {
+      width: 100%;
+      max-width: 13rem;
+      font-size: 1.05rem;
+      padding: 0.7rem 1rem;
+    }
+  }
+}
+
+@media (max-width: 30rem) {
+  .settings {
+    padding: 1rem 0 0.8rem;
+
+    &__layout {
+      width: calc(100% - 1rem);
+    }
+
+    &__content {
+      gap: 0.85rem;
+    }
+
+    &__panel,
+    &__preview {
+      padding: 0.65rem;
+    }
+
+    &__form {
+      gap: 1rem;
+    }
+
+    &__steps-mount {
+      padding: 0.45rem 0.45rem;
+    }
+
+    &__start-button {
+      max-width: none;
+      width: 100%;
+    }
+  }
+}
+
+@media (max-height: 31rem) and (orientation: landscape) {
+  .settings {
+    padding: 0.75rem 0 0.6rem;
+
+    &__content {
+      flex-direction: row;
+      gap: 0.85rem;
+      align-items: flex-start;
+    }
+
+    &__panel,
+    &__preview {
+      flex: 1 1 50%;
+      padding: 0.6rem;
+    }
+
+    &__form {
+      gap: 0.85rem;
+    }
+
+    &__group-title {
+      margin-bottom: 0.45rem;
+    }
+
+    &__options {
+      gap: 0.55rem;
+    }
+
+    &__steps {
+      min-height: auto;
+      gap: 0.3rem 0.45rem;
+      padding: 0.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    &__separator {
+      width: 1.2rem;
+      height: 1.5rem;
+    }
+
+    &__start-button {
+      padding: 0.55rem 0.85rem;
+      font-size: 0.95rem;
     }
   }
 }

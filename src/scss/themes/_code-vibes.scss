@@ -1,11 +1,32 @@
 @use "../abstracts" as *;
 
+$code-vibes-game-over-main-gap: clamp(2.35rem, 4.9vh, 3.5rem);
+
 .game[data-theme="code-vibes"] {
   --memory-card-size: 7.5rem;
   --memory-match-border-color: rgba(77, 213, 188, 1);
   --memory-card-radius: 0.5rem;
   --memory-match-border-radius: 0.5rem;
   --memory-collected-card-radius: 0.5rem;
+  --exit-dialog-bg: rgb(230, 230, 230);
+  --exit-dialog-font-family: "Red Rose";
+  --exit-dialog-font-weight: 700;
+  --exit-title-font-family: "Red Rose";
+  --exit-title-font-size: 2rem;
+  --exit-title-font-weight: 700;
+  --exit-title-line-height: 1.2;
+  --exit-actions-justify: center;
+  --exit-actions-gap: 2rem;
+  --exit-action-width: 15.5rem;
+  --exit-action-min-height: 4.8rem;
+  --exit-action-radius: 0;
+  --exit-action-padding: 0.6rem 1rem;
+  --exit-action-font-family: "Red Rose";
+  --exit-action-font-size: 1.25rem;
+  --exit-action-font-weight: 700;
+  --exit-action-line-height: 1;
+  --exit-action-text-wrap: nowrap;
+  --exit-action-transition: none;
 
   .game__player-info {
     display: flex;
@@ -98,39 +119,6 @@
     height: 2rem;
   }
 
-  .game__exit-dialog {
-    background-color: rgb(230, 230, 230);
-    font-family: "Red Rose";
-    font-weight: 700;
-  }
-
-  .game__exit-title {
-    font-family: "Red Rose";
-    font-weight: 700;
-    font-size: 2rem;
-    line-height: 1.2;
-  }
-
-  .game__exit-actions {
-    justify-content: center;
-    gap: 2rem;
-  }
-
-  .game__exit-continue,
-  .game__exit-confirm {
-    text-align: center;
-    justify-content: center;
-    width: 15.5rem;
-    height: 4.8rem;
-    border-radius: 0;
-    font-family: "Red Rose";
-    font-weight: 700;
-    font-size: 1.25rem;
-    line-height: 1;
-    text-wrap: nowrap;
-    transition: none;
-  }
-
   .game__exit-continue {
     border: 2px solid rgba(98, 199, 184, 1);
     background-color: rgba(98, 199, 184, 1);
@@ -156,4 +144,242 @@
   .game__exit-confirm:not(:disabled):active {
     transform: none;
   }
+
+  .winner {
+    color: rgb(255, 255, 255);
+    font-family: "Red Rose";
+  }
+
+  .winner__title {
+    font-weight: 400;
+  }
+
+  .winner__continue {
+    color: rgba(255, 255, 255, 0.82);
+    font-family: "Red Rose";
+    font-weight: 700;
+  }
+
+  .game-over {
+    gap: $code-vibes-game-over-main-gap;
+    color: rgb(255, 255, 255);
+    font-family: "Red Rose";
+  }
+
+  .game-over__title,
+  .winner__draw-title {
+    margin: -0.6rem 0 0;
+    font-size: clamp(5.5rem, 12.2vw, 12rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    color: rgba(98, 199, 184, 1);
+    text-shadow:
+      -0.2rem -0.2rem 0 rgba(255, 255, 255, 0.9),
+      0 0 0.75rem rgba(98, 199, 184, 0.34),
+      -0.3rem -0.38rem 0.75rem rgba(255, 255, 255, 0.26);
+  }
+
+  .game-over__score-title {
+    font-size: 2rem;
+    font-weight: 400;
+  }
+
+  .game-over__scores {
+    min-height: 2.9rem;
+    padding: 0.58rem 0.95rem;
+    background-color: rgb(61, 75, 72);
+    font-family: "Red Rose";
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .game-over__score-icon {
+    width: 1.55rem;
+    height: 1.45rem;
+  }
+
+  .game-over__score-value {
+    font-size: 2rem;
+    letter-spacing: 0.01em;
+  }
+
+  .game-over__score-label,
+  .game-over__score-number {
+    font-size: 2rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+  }
+
+  .game-over__score--blue {
+    color: rgba(43, 177, 255, 1);
+  }
+
+  .game-over__score--orange {
+    color: rgba(245, 142, 57, 1);
+  }
+
+  .game-over__restart-button,
+  .game-over__exit-button {
+    @include inline-flex-center(0.875rem);
+    width: 13rem;
+    height: 4rem;
+    padding: 1rem 1.625rem;
+    border: 2px solid rgba(77, 213, 188, 1);
+    background-color: rgb(61, 75, 72);
+    color: rgb(255, 255, 255);
+    font-family: "Red Rose";
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    text-wrap: nowrap;
+    transition: none;
+  }
+
+  .game-over__actions {
+    margin-top: calc(#{$code-vibes-game-over-main-gap} + 2rem);
+  }
+
+  .game-over__restart-button:not(:disabled):hover,
+  .game-over__exit-button:not(:disabled):hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow:
+      inset 0 0 0 1px rgba(77, 213, 188, 1),
+      0.3rem 0.38rem 0.75rem rgba(255, 255, 255, 0.26);
+  }
+
+  .game-over__restart-button:not(:disabled):active,
+  .game-over__exit-button:not(:disabled):active {
+    transform: none;
+  }
+
+  @media (max-width: 48rem) {
+    --exit-dialog-width: min(26rem, 100%);
+    --exit-dialog-min-height: auto;
+    --exit-dialog-padding: 1rem;
+    --exit-title-font-size: 1.3rem;
+    --exit-actions-direction: column;
+    --exit-actions-align: center;
+    --exit-actions-margin-top: 1rem;
+    --exit-actions-gap: 0.6rem;
+    --exit-action-width: min(100%, 14rem);
+    --exit-action-min-height: 2.7rem;
+    --exit-action-font-size: 1rem;
+
+    .game__player-info {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "count exit"
+        "current current";
+      row-gap: 0.6rem;
+      min-height: auto;
+      padding: 0.65rem 0.85rem;
+    }
+
+    .game__player-count {
+      grid-area: count;
+      margin-right: 0;
+      min-height: 2.6rem;
+      padding: 0.35rem 0.55rem;
+      gap: 0.85rem;
+    }
+
+    .game__player-count-value {
+      font-size: 1.2rem;
+    }
+
+    .game__player-current {
+      grid-area: current;
+      position: static;
+      left: auto;
+      transform: none;
+      justify-self: center;
+    }
+
+    .game__player-current-label {
+      font-size: 1.25rem;
+    }
+
+    .game__player-current-icon {
+      width: 1.45rem;
+      height: 1.25rem;
+    }
+
+    .game__exit-button {
+      grid-area: exit;
+      margin-left: 0;
+      justify-self: end;
+      padding: 0.55rem 0.75rem;
+      min-height: 2.6rem;
+      height: auto;
+      font-size: 1rem;
+      gap: 0.5rem;
+    }
+
+    .game__exit-button-icon {
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+
+    .game-over__title,
+    .winner__draw-title {
+      font-size: clamp(3rem, 15vw, 4.8rem);
+      margin-top: 0;
+    }
+
+    .game-over__score-title {
+      font-size: 1.4rem;
+    }
+
+    .game-over__score-label,
+    .game-over__score-number {
+      font-size: 1.3rem;
+    }
+
+    .game-over__restart-button,
+    .game-over__exit-button {
+      width: min(100%, 11.5rem);
+      min-height: 2.8rem;
+      height: auto;
+      font-size: 1.05rem;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    --exit-dialog-padding: 0.8rem;
+    --exit-title-font-size: 1.08rem;
+    --exit-action-min-height: 2.45rem;
+    --exit-action-font-size: 0.95rem;
+
+    .game__player-info {
+      padding: 0.5rem 0.6rem;
+    }
+
+    .game__player-count {
+      padding: 0.28rem 0.42rem;
+      gap: 0.55rem;
+    }
+
+    .game__player-count-value {
+      font-size: 1rem;
+    }
+
+    .game__player-current-label {
+      font-size: 1.05rem;
+    }
+
+    .game__exit-button {
+      padding: 0.45rem 0.55rem;
+      min-height: 2.3rem;
+      font-size: 0.92rem;
+    }
+
+    .game__exit-button-label {
+      display: none;
+    }
+
+  }
 }
+

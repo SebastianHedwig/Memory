@@ -8,8 +8,6 @@
   color: rgba(48, 49, 49, 1);
   font-size: 2.5rem;
   padding: 1.5rem;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
-  will-change: transform;
 
   &--primary {
     background-color: $primary-btn-color;

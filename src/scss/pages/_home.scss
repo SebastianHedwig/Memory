@@ -59,3 +59,53 @@ body {
   mask: url("../../assets/img/controller-watermark.png") no-repeat left bottom / contain;
   pointer-events: none;
 }
+
+@media (max-width: 30rem) {
+  body.home {
+    padding-inline: 0.75rem;
+  }
+
+  .title {
+    margin-bottom: clamp(0.8rem, 4vw, 1.4rem);
+  }
+
+  .subtitle {
+    margin-bottom: clamp(0.65rem, 3.4vw, 1.1rem);
+  }
+
+  .home .button {
+    width: min(100%, 17.5rem);
+    justify-content: center;
+    font-size: clamp(1.25rem, 6.2vw, 1.65rem);
+    gap: 0.85rem;
+    padding: 0.7rem 0.8rem;
+  }
+}
+
+@media (max-height: 31rem) and (orientation: landscape) {
+  body.home {
+    justify-content: center;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .title {
+    margin-bottom: 0.45rem;
+    font-size: clamp(2.1rem, 8.2vw, 3.6rem);
+  }
+
+  .subtitle {
+    margin-bottom: 0.5rem;
+    font-size: clamp(0.95rem, 3.1vw, 1.3rem);
+  }
+
+  .home .button {
+    font-size: clamp(1rem, 2.9vw, 1.35rem);
+    gap: 0.65rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .controller-watermark {
+    opacity: 0.28;
+    width: clamp(9rem, 35vw, 20rem);
+  }
+}
