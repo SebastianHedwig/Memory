@@ -112,7 +112,6 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    transition: transform 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, background-color 0.22s ease;
   }
 
   .game__exit-button:not(:disabled):hover {
@@ -132,7 +131,6 @@
   .game__exit-button-icon {
     width: 1.85rem;
     height: 1.85rem;
-    transition: filter 0.22s ease;
   }
 
   .game__exit-button:not(:disabled):hover .game__exit-button-icon {
@@ -182,7 +180,6 @@
     font-weight: 700;
     line-height: 1;
     text-wrap: nowrap;
-    transition: transform 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, background-color 0.22s ease;
   }
 
   .game__exit-continue {

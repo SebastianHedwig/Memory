@@ -11,6 +11,10 @@
   perspective: 900px;
 }
 
+.memory-card.is-flipped:not(.memory-card-ghost):not(.is-matched):not(.is-collected) {
+  animation: memory-card-lift-pop 0.32s ease;
+}
+
 .memory-card::after {
   content: "";
   position: absolute;
@@ -86,5 +90,17 @@
   }
   100% {
     clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes memory-card-lift-pop {
+  0% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-0.14rem);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

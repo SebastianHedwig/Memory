@@ -1,4 +1,7 @@
 type GameTheme = "code-vibes" | "gaming" | "foods";
+const EXIT_OVERLAY_CLOSE_MS = 420;
+const EXIT_OVERLAY_CLOSING_CLASS = "is-closing";
+let exitOverlayHideTimerId: number | null = null;
 
 export interface ExitOverlayCopy {
   title: string;
@@ -46,13 +49,61 @@ function getExitOverlay(): HTMLElement | null {
   return document.querySelector<HTMLElement>("[data-game-exit-overlay]");
 }
 
+function clearExitOverlayHideTimer(): void {
+  if (exitOverlayHideTimerId === null) {
+    return;
+  }
+
+  window.clearTimeout(exitOverlayHideTimerId);
+  exitOverlayHideTimerId = null;
+}
+
+function getOverlayCloseDelay(): number {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : EXIT_OVERLAY_CLOSE_MS;
+}
+
+function hideOverlayImmediately(overlay: HTMLElement): void {
+  overlay.hidden = true;
+  overlay.classList.remove(EXIT_OVERLAY_CLOSING_CLASS);
+}
+
+function showOverlay(overlay: HTMLElement): void {
+  clearExitOverlayHideTimer();
+  overlay.classList.remove(EXIT_OVERLAY_CLOSING_CLASS);
+  overlay.hidden = false;
+}
+
+function hideOverlayWithAnimation(overlay: HTMLElement): void {
+  if (overlay.hidden) {
+    return;
+  }
+
+  clearExitOverlayHideTimer();
+  const closeDelay = getOverlayCloseDelay();
+  if (closeDelay === 0) {
+    hideOverlayImmediately(overlay);
+    return;
+  }
+
+  overlay.classList.add(EXIT_OVERLAY_CLOSING_CLASS);
+  exitOverlayHideTimerId = window.setTimeout(() => {
+    exitOverlayHideTimerId = null;
+    hideOverlayImmediately(overlay);
+  }, closeDelay);
+}
+
 function setExitOverlayVisibility(isVisible: boolean): void {
   const overlay = getExitOverlay();
   if (!overlay) {
     return;
   }
 
-  overlay.hidden = !isVisible;
+  if (isVisible) {
+    showOverlay(overlay);
+    return;
+  }
+
+  hideOverlayWithAnimation(overlay);
 }
 
 function getActionElement(target: EventTarget | null): HTMLElement | null {

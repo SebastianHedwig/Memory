@@ -11,6 +11,24 @@
   display: none;
 }
 
+.game__exit-overlay:not([hidden]):not(.is-closing) .game__exit-overlay-backdrop {
+  animation: game-exit-backdrop-enter 220ms ease-out;
+}
+
+.game__exit-overlay:not([hidden]):not(.is-closing) .game__exit-dialog {
+  transform-origin: center bottom;
+  animation: game-exit-dialog-enter 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.game__exit-overlay.is-closing .game__exit-overlay-backdrop {
+  animation: game-exit-backdrop-leave 220ms ease-in forwards;
+}
+
+.game__exit-overlay.is-closing .game__exit-dialog {
+  transform-origin: center bottom;
+  animation: game-exit-dialog-leave 420ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
 .game__exit-overlay-backdrop {
   position: absolute;
   inset: 0;
@@ -47,4 +65,51 @@
 .game__exit-continue,
 .game__exit-confirm {
   font-size: 1.25rem;
+}
+
+@keyframes game-exit-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes game-exit-dialog-enter {
+  from {
+    opacity: 1;
+    transform: translateY(calc(100vh + 4rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes game-exit-backdrop-leave {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes game-exit-dialog-leave {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(calc(100vh + 4rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game__exit-overlay .game__exit-overlay-backdrop,
+  .game__exit-overlay .game__exit-dialog {
+    animation: none;
+  }
 }
