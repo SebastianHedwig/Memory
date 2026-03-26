@@ -19,6 +19,7 @@
   pointer-events: none;
   opacity: 0;
   border: 4px solid var(--memory-match-border-color, rgba(77, 213, 188, 1));
+  border-radius: var(--memory-match-border-radius, 0);
   clip-path: inset(0 100% 0 0);
 }
 
@@ -42,6 +43,7 @@
   height: 100%;
   object-fit: contain;
   object-position: var(--memory-card-image-position, center center);
+  border-radius: var(--memory-card-radius, 0);
   backface-visibility: hidden;
   user-select: none;
   -webkit-user-drag: none;

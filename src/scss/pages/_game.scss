@@ -91,6 +91,7 @@
   object-fit: contain;
   object-position: var(--memory-card-image-position, center center);
   border: 2px solid var(--memory-match-border-color, rgba(77, 213, 188, 1));
+  border-radius: var(--memory-collected-card-radius, 0);
   margin-top: calc(var(--memory-card-size, 7.75rem) * -0.28);
 }
 

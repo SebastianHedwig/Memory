@@ -278,11 +278,11 @@ function playerLabel(player: PlayerColor): string {
 
 function getScoreLabel(state: MemoryGameState, player: PlayerColor): string {
   const score = state.scores[player];
-  if (state.settings.theme === "gaming") {
-    return String(score);
+  if (state.settings.theme === "code-vibes") {
+    return `${playerLabel(player)} ${score}`;
   }
 
-  return `${playerLabel(player)} ${score}`;
+  return String(score);
 }
 
 function getScoreElement(player: PlayerColor): HTMLElement | null {

@@ -3,6 +3,9 @@
 .game[data-theme="code-vibes"] {
   --memory-card-size: 7.5rem;
   --memory-match-border-color: rgba(77, 213, 188, 1);
+  --memory-card-radius: 0.5rem;
+  --memory-match-border-radius: 0.5rem;
+  --memory-collected-card-radius: 0.5rem;
 
   .game__player-info {
     display: flex;

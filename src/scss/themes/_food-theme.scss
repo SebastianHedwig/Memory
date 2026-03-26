@@ -1,17 +1,82 @@
 .game[data-theme="foods"] {
   --memory-card-size: 7.5rem;
   --memory-match-border-color: rgba(243, 131, 45, 1);
+  --memory-card-radius: 0.5rem;
+  --memory-match-border-radius: 0.5rem;
+  --memory-collected-card-radius: 0.5rem;
+  background-color: rgb(250, 245, 238);
+  color: rgba(164, 82, 18, 1);
+  font-family: "Delius Unicase";
+
+  .game__header {
+    padding-top: 0.9rem;
+  }
+
+  .game__player-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    position: relative;
+    min-height: 5.95rem;
+    padding: 0.95rem 2rem;
+    border-radius: 0.65rem;
+    background-color: rgba(240, 229, 217, 1);
+    font-family: "Delius Unicase";
+    font-weight: 700;
+  }
+
+  .game__player-count {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 10rem;
+    min-height: 3.1rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 249, 242, 1);
+  }
 
   .game__player-count-inner {
-    width: 10rem;
+    width: 4rem;
     justify-content: flex-start;
+    gap: 0.35rem;
+  }
+
+  .player-Blue {
+    color: rgba(52, 129, 204, 1);
+  }
+
+  .player-Orange {
+    color: rgba(219, 102, 7, 1);
+  }
+
+  .game__player-count-icon {
+    width: 1.55rem;
+    height: 1.55rem;
   }
 
   .game__player-count-value {
     font-size: 1.875rem;
+    line-height: 1;
     min-width: 2ch;
     text-align: left;
     font-variant-numeric: tabular-nums;
+  }
+
+  .game__player-current {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(164, 82, 18, 1);
+    font-family: "Klee One";
+    font-weight: 600;
+    gap: 0.7rem;
+  }
+
+  .game__player-current-label {
+    font-size: 2.2rem;
+    line-height: 1;
   }
 
   .game__player-current-badge {
@@ -31,5 +96,121 @@
   .game__player-current-icon {
     width: 1.7rem;
     height: 1.7rem;
+  }
+
+  .game__exit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-left: auto;
+    border-radius: 0.65rem;
+    border: 2px solid rgba(243, 131, 45, 1);
+    background-color: rgba(255, 249, 242, 1);
+    color: rgba(243, 131, 45, 1);
+    font-family: "Delius Unicase";
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, background-color 0.22s ease;
+  }
+
+  .game__exit-button:not(:disabled):hover {
+    transform: translateY(-1px) scale(1.02);
+    border-color: rgba(243, 131, 45, 1);
+    background-color: rgba(243, 131, 45, 1);
+    color: rgb(255, 255, 255);
+    box-shadow:
+      inset 0 0 0 1px rgba(243, 131, 45, 1),
+      0.22rem 0.24rem 0.55rem rgba(243, 131, 45, 0.34);
+  }
+
+  .game__exit-button:not(:disabled):active {
+    transform: none;
+  }
+
+  .game__exit-button-icon {
+    width: 1.85rem;
+    height: 1.85rem;
+    transition: filter 0.22s ease;
+  }
+
+  .game__exit-button:not(:disabled):hover .game__exit-button-icon {
+    filter: brightness(0) saturate(100%) invert(100%);
+  }
+
+  .game__exit-overlay-backdrop {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .game__exit-dialog {
+    width: min(38rem, 100%);
+    aspect-ratio: unset;
+    min-height: 17.5rem;
+    border-radius: 1.6rem;
+    padding: 2.35rem 2.45rem 2rem;
+    background-color: rgba(230, 230, 230, 1);
+    font-family: "Delius Unicase";
+    font-weight: 700;
+    color: rgba(164, 82, 18, 1);
+  }
+
+  .game__exit-title {
+    margin: 0;
+    text-align: center;
+    font-family: "Klee One";
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+  }
+
+  .game__exit-actions {
+    justify-content: center;
+    gap: 1.8rem;
+  }
+
+  .game__exit-continue,
+  .game__exit-confirm {
+    justify-content: center;
+    gap: 0;
+    min-height: 4rem;
+    border-radius: 0.95rem;
+    padding: 0.7rem 1.35rem;
+    font-family: "Delius Unicase";
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    text-wrap: nowrap;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, color 0.22s ease, background-color 0.22s ease;
+  }
+
+  .game__exit-continue {
+    width: 17.5rem;
+    border: 2px solid rgba(243, 131, 45, 1);
+    background-color: rgba(255, 171, 62, 1);
+    color: rgb(255, 255, 255);
+  }
+
+  .game__exit-confirm {
+    width: 12rem;
+    border: 2px solid rgba(243, 131, 45, 1);
+    background-color: rgba(255, 249, 242, 1);
+    color: rgba(243, 131, 45, 1);
+  }
+
+  .game__exit-continue:not(:disabled):hover,
+  .game__exit-confirm:not(:disabled):hover {
+    transform: translateY(-1px) scale(1.02);
+    background-color: rgba(243, 131, 45, 1);
+    color: rgb(255, 255, 255);
+    box-shadow:
+      inset 0 0 0 1px rgba(243, 131, 45, 1),
+      0.22rem 0.24rem 0.55rem rgba(243, 131, 45, 0.34);
+  }
+
+  .game__exit-continue:not(:disabled):active,
+  .game__exit-confirm:not(:disabled):active {
+    transform: none;
   }
 }
