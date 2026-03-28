@@ -24,7 +24,7 @@ export function settingsOptionTemplate(id: string, name: string, value: string, 
  * Updates Settings Group Template on the target element or state.
  * @param title Section title text.
  * @param iconSrc Image path for an icon asset.
- * @param optionsMarkup Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param optionsMarkup Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 export function settingsGroupTemplate(title: string, iconSrc: string, optionsMarkup: string): string {
@@ -70,11 +70,12 @@ export function settingsSeparatorTemplate(separatorSrc: string, isActive: boolea
  */
 export function settingsStepsTemplate(renderedSteps: string, isStartEnabled: boolean): string {
   return /*html*/ `
-    <nav class="settings__steps" aria-label="Settings navigation">
+    <div class="settings__steps" role="group" aria-label="Settings progress and start action">
       ${renderedSteps}
       <button class="settings__start-button button button--primary" type="button"${isStartEnabled ? "" : " disabled"}>
         <img class="settings__start-icon" src="${startIconSrc}" alt="" aria-hidden="true">
         Start
       </button>
-    </nav>`;
+    </div>`;
 }
+

@@ -2,12 +2,28 @@
 @use "../base/typography" as *;
 @use "../components/button" as *;
 
-body {
+body.home {
   background-color: $primary-bg-color;
+  color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  position: relative;
+}
+
+.home__main {
   @include flex-center(column);
-  height: 100vh;
-  width: 100vw;
-  margin: 0 auto;
+  flex: 1 1 auto;
+  text-align: center;
+  padding: clamp(1rem, 3vw, 2rem) 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.title-box {
+  @include flex-stack(0, center);
 }
 
 .title {
@@ -35,6 +51,69 @@ body {
   padding: clamp(0.75rem, 2vw, 1.5rem) clamp(1.1rem, 3vw, 2rem);
 }
 
+.home__footer {
+  width: 100%;
+  margin: 0;
+  margin-top: auto;
+  padding: 0.85rem max(0.95rem, calc((100vw - 70rem) / 2 + 0.95rem));
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(77, 213, 188, 0.4);
+  background-color: rgba(40, 43, 42, 0.5);
+  border-radius: 0;
+  font-family: "Almarai", sans-serif;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  position: relative;
+  z-index: 1;
+}
+
+.home__footer-link {
+  color: rgba(77, 213, 188, 1);
+  font-weight: 700;
+  width: fit-content;
+  transition: opacity 0.2s ease;
+}
+
+.home__footer-link:hover,
+.home__footer-link:focus-visible {
+  opacity: 0.8;
+}
+
+.home__footer-link--right {
+  justify-self: end;
+}
+
+.home__footer-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.home__footer-copy {
+  color: rgba(77, 213, 188, 1);
+  font-weight: 700;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.home__footer-assets-link {
+  color: rgba(77, 213, 188, 1);
+  font-size: clamp(0.62rem, 1vw, 0.78rem);
+  font-weight: 500;
+  line-height: 1.1;
+  opacity: 0.9;
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
+.home__footer-assets-link:hover,
+.home__footer-assets-link:focus-visible {
+  opacity: 1;
+}
+
 .button__controller-icon {
   transition: transform 0.2s ease;
 }
@@ -47,7 +126,7 @@ body {
   content: url(../../assets/icons/arrow-right-hover.png)
 }
 
-.controller-watermark {
+.home .controller-watermark {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -62,7 +141,30 @@ body {
 
 @media (max-width: 30rem) {
   body.home {
+    padding-inline: 0;
+  }
+
+  .home__main {
     padding-inline: 0.75rem;
+  }
+
+  .home__footer {
+    width: 100%;
+    margin: 0;
+    padding: 0.65rem max(0.65rem, env(safe-area-inset-right)) 0.65rem
+      max(0.65rem, env(safe-area-inset-left));
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 0.25rem;
+  }
+
+  .home__footer-link--right {
+    justify-self: center;
+  }
+
+  .home__footer-assets-link {
+    font-size: 0.68rem;
   }
 
   .title {
@@ -84,8 +186,14 @@ body {
 
 @media (max-height: 31rem) and (orientation: landscape) {
   body.home {
-    justify-content: center;
+    justify-content: flex-start;
     padding: 0.65rem 0.9rem;
+  }
+
+  .home__footer {
+    margin: 0;
+    padding: 0.4rem max(0.65rem, calc((100vw - 70rem) / 2 + 0.65rem));
+    font-size: 0.9rem;
   }
 
   .title {

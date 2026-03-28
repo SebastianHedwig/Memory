@@ -83,7 +83,7 @@ function getCurrentScreenElement(): HTMLElement | null {
 
 /**
  * Executes Prepare Entering Screen for the current flow.
- * @param element Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param element Input value used in this processing step.
  * @returns No return value; this function works via side effects.
  */
 function prepareEnteringScreen(element: HTMLElement): void {
@@ -133,4 +133,5 @@ export function renderScreenWithTransition(state: ScreenRenderState): void {
 
   animateLeavingScreenAndRender(currentScreenElement, state);
 }
+
 

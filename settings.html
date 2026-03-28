@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en" translate="no" class="notranslate">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
     <title>Memory | Settings</title>
     <script type="module" src="./src/settings.ts" defer></script>
 </head>
-<body class="settings">
+<body class="settings notranslate" translate="no">
     <main class="settings__layout">
         <header class="settings__header">
-            <h2 class="settings__title">Settings</h2>
+            <h1 class="settings__title">Settings</h1>
             <img class="settings__title-underline" src="./src/assets/icons/settings-icons/title-unterline.png" alt="" aria-hidden="true">
         </header>
         
         <div class="settings__content">
             <section class="settings__panel">
-                <form class="settings__form" aria-label="Spieleinstellungen" data-settings-form></form>
+                <form class="settings__form" aria-label="Game settings" data-settings-form></form>
             </section>
 
-            <section class="settings__preview">
+            <aside class="settings__preview" aria-label="Theme preview and start steps">
                 <div class="settings__preview-card">
-                    <img src="./src/assets/img/themes/code-vibes/preview-codeVibes.png" alt="Vorschau des Code Vibes Themes">
+                    <img src="./src/assets/img/themes/code-vibes/preview-codeVibes.png" alt="Preview of the Code Vibes theme">
                 </div>
 
-                <div class="settings__steps-mount" data-settings-steps></div>
-            </section>
+                <div class="settings__steps-mount" data-settings-steps aria-live="polite"></div>
+            </aside>
         </div>
     </main>
 </body>

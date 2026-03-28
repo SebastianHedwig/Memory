@@ -11,7 +11,7 @@ interface GameLayoutTemplateData {
 
 /**
  * Executes Game Player Count Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 function gamePlayerCountTemplate(data: GameLayoutTemplateData): string {
@@ -68,21 +68,21 @@ function gameExitButtonTemplate(exitButtonIconSrc: string, exitButtonLabel: stri
  */
 function gameBoardTableTemplate(): string {
   return /*html*/ `
-    <section class="game__table">
+    <div class="game__table">
       <aside class="game__player-stack game__player-stack--blue" data-player-stack="blue" aria-label="Blue matched cards"></aside>
-      <section class="game__board" data-game-board></section>
+      <section class="game__board" data-game-board aria-label="Memory game board"></section>
       <aside class="game__player-stack game__player-stack--orange" data-player-stack="orange" aria-label="Orange matched cards"></aside>
-    </section>`;
+    </div>`;
 }
 
 /**
  * Executes Game Layout Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 export function gameLayoutTemplate(data: GameLayoutTemplateData): string {
   return /*html*/ `
-    <main class="game__layout">
+    <main class="game__layout notranslate" translate="no">
       <header class="game__header">
         <div class="game__player-info">
           ${gamePlayerCountTemplate(data)}
@@ -110,14 +110,14 @@ type DrawTemplateData = {
 
 /**
  * Executes Winner Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 export function winnerTemplate(data: WinnerTemplateData): string {
   return /*html*/ `
-    <section class="winner" data-winner-screen>
-      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Bild mit viel Konfetti">` : ""}
-      <span class="winner__title">The winner is</span>
+    <section class="winner notranslate" data-winner-screen aria-labelledby="winner-title" translate="no">
+      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Confetti decoration">` : ""}
+      <h1 class="winner__title" id="winner-title">The winner is</h1>
       <h2 class="winner__player winner__player--${data.playerColor}">${data.playerName}</h2>
       <div class="winner__player-media">
         <img class="winner__player-img" src="${data.playerImageSrc}" alt="${data.playerImageAlt}">
@@ -129,14 +129,14 @@ export function winnerTemplate(data: WinnerTemplateData): string {
 
 /**
  * Executes Draw Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 export function drawTemplate(data: DrawTemplateData): string {
   return /*html*/ `
-    <section class="winner" data-winner-screen>
-      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Bild mit viel Konfetti">` : ""}
-      <h2 class="winner__draw-title">DRAW</h2>
+    <section class="winner notranslate" data-winner-screen aria-labelledby="draw-title" translate="no">
+      ${data.confettiSrc ? `<img class="winner__confetti-image" src="${data.confettiSrc}" alt="Confetti decoration">` : ""}
+      <h1 class="winner__draw-title" id="draw-title">DRAW</h1>
       <p class="winner__continue winner__continue--pending" data-winner-continue>Click to continue</p>
     </section>`;
 }
@@ -150,9 +150,9 @@ type GameOverTemplateData = {
 
 /**
  * Executes Game Over Score Template for the current flow.
- * @param color Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param color Input value used in this processing step.
  * @param iconSrc Image path for an icon asset.
- * @param score Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param score Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 function gameOverScoreTemplate(color: "blue" | "orange", iconSrc: string, score: number): string {
@@ -181,15 +181,15 @@ function gameOverActionsTemplate(): string {
 
 /**
  * Executes Game Over Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 export function gameOverTemplate(data: GameOverTemplateData): string {
   return /*html*/ `
-    <section class="game-over" aria-labelledby="game-over-title">
+    <section class="game-over notranslate" aria-labelledby="game-over-title" translate="no">
       <h1 class="game-over__title" id="game-over-title">Game Over</h1>
       <div class="game-over__score-box">
-        <span class="game-over__score-title">Final score</span>
+        <h2 class="game-over__score-title">Final score</h2>
         <div class="game-over__scores">
           ${gameOverScoreTemplate("blue", data.blueIconSrc, data.blueScore)}
           ${gameOverScoreTemplate("orange", data.orangeIconSrc, data.orangeScore)}
@@ -198,3 +198,4 @@ export function gameOverTemplate(data: GameOverTemplateData): string {
       </div>
     </section>`;
 }
+

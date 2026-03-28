@@ -51,15 +51,15 @@ interface ThemePreview {
 const themePreviewByValue: Record<GameSettings["theme"], ThemePreview> = {
   "code-vibes": {
     src: previewCodeVibesSrc,
-    alt: "Vorschau des Code Vibes Themes",
+    alt: "Preview of the Code Vibes theme",
   },
   gaming: {
     src: previewGamingThemeSrc,
-    alt: "Vorschau des Gaming Themes",
+    alt: "Preview of the Gaming theme",
   },
   foods: {
     src: previewFoodThemeSrc,
-    alt: "Vorschau des Food Themes",
+    alt: "Preview of the Food theme",
   },
 };
 
@@ -315,7 +315,7 @@ function buildStepItems(form: HTMLFormElement): SettingsStepItem[] {
 
 /**
  * Renders Step into the UI.
- * @param item Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param item Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 function renderStep(item: SettingsStepItem): string {
@@ -327,7 +327,7 @@ function renderStep(item: SettingsStepItem): string {
 
 /**
  * Renders Step Items into the UI.
- * @param stepItems Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param stepItems Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 function renderStepItems(stepItems: SettingsStepItem[]): string {
@@ -473,13 +473,27 @@ function syncThemePreviewToSelection(form: HTMLFormElement): void {
 
 /**
  * Binds event handlers for Theme Hover.
- * @param optionElement Interactive option element in the settings UI.
+ * @param optionLabel Interactive option label in the settings UI.
  * @param input Input element used in the current operation.
  * @returns No return value; this function works via side effects.
  */
-function bindThemeHover(optionElement: HTMLElement, input: HTMLInputElement): void {
-  optionElement.addEventListener("mouseenter", () => setThemePreview(input.value));
-  optionElement.addEventListener("mouseleave", () => setThemePreview(selectedThemeValue));
+function bindThemeHover(optionLabel: HTMLLabelElement, input: HTMLInputElement): void {
+  optionLabel.addEventListener("mouseenter", () => setThemePreview(input.value));
+  optionLabel.addEventListener("mouseleave", () => setThemePreview(selectedThemeValue));
+}
+
+/**
+ * Returns Theme Option Label from the current DOM/state context.
+ * @param form Settings form element containing the current selections.
+ * @param input Input element used in the current operation.
+ * @returns Resolved `HTMLLabelElement`, or `null` when no matching element can be resolved.
+ */
+function getThemeOptionLabel(form: HTMLFormElement, input: HTMLInputElement): HTMLLabelElement | null {
+  if (!input.id) {
+    return null;
+  }
+
+  return form.querySelector<HTMLLabelElement>(`.settings__option-label[for="${input.id}"]`);
 }
 
 /**
@@ -491,9 +505,9 @@ function initThemePreviewHover(form: HTMLFormElement): void {
   const themeInputs = form.querySelectorAll<HTMLInputElement>('input[name="theme"]');
 
   themeInputs.forEach((input) => {
-    const optionElement = input.closest<HTMLElement>(".settings__option");
-    if (optionElement) {
-      bindThemeHover(optionElement, input);
+    const optionLabel = getThemeOptionLabel(form, input);
+    if (optionLabel) {
+      bindThemeHover(optionLabel, input);
     }
   });
 }
@@ -626,3 +640,4 @@ function mountSettingsForm(): void {
 }
 
 mountSettingsForm();
+

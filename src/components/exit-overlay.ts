@@ -43,7 +43,7 @@ export function getExitOverlayCopy(theme: GameTheme): ExitOverlayCopy {
  */
 export function exitOverlayTemplate(copy: ExitOverlayCopy): string {
   return /*html*/ `
-    <section class="game__exit-overlay" id="game-exit-overlay" data-game-exit-overlay hidden>
+    <section class="game__exit-overlay notranslate" id="game-exit-overlay" data-game-exit-overlay translate="no" hidden>
       <button class="game__exit-overlay-backdrop" type="button" data-action="close-exit-overlay" aria-label="Close exit dialog"></button>
       <div class="game__exit-dialog" role="dialog" aria-modal="true" aria-labelledby="game-exit-title">
         <h3 class="game__exit-title" id="game-exit-title">${copy.title}</h3>
@@ -86,7 +86,7 @@ function getOverlayCloseDelay(): number {
 
 /**
  * Executes Hide Overlay Immediately for the current flow.
- * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param overlay Input value used in this processing step.
  * @returns No return value; this function works via side effects.
  */
 function hideOverlayImmediately(overlay: HTMLElement): void {
@@ -96,7 +96,7 @@ function hideOverlayImmediately(overlay: HTMLElement): void {
 
 /**
  * Executes Show Overlay for the current flow.
- * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param overlay Input value used in this processing step.
  * @returns No return value; this function works via side effects.
  */
 function showOverlay(overlay: HTMLElement): void {
@@ -107,7 +107,7 @@ function showOverlay(overlay: HTMLElement): void {
 
 /**
  * Executes Hide Overlay With Animation for the current flow.
- * @param overlay Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param overlay Input value used in this processing step.
  * @returns No return value; this function works via side effects.
  */
 function hideOverlayWithAnimation(overlay: HTMLElement): void {
@@ -205,10 +205,11 @@ function onExitOverlayClick(event: MouseEvent, onExitGame: () => void): void {
 
 /**
  * Binds event handlers for Exit Overlay Actions.
- * @param rootElement DOM-Element, das in diesem Schritt gelesen oder aktualisiert wird.
+ * @param rootElement DOM element read or updated in this step.
  * @param onExitGame Callback executed when the game should be exited.
  * @returns No return value; this function works via side effects.
  */
 export function bindExitOverlayActions(rootElement: HTMLElement, onExitGame: () => void): void {
   rootElement.addEventListener("click", (event: MouseEvent) => onExitOverlayClick(event, onExitGame));
 }
+

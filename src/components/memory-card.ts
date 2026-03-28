@@ -16,7 +16,7 @@ function cardClassName(isFlipped: boolean): string {
 
 /**
  * Executes Memory Card Template for the current flow.
- * @param data Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param data Input value used in this processing step.
  * @param isFlipped Controls whether a card is rendered as flipped.
  * @returns Generated string value for rendering or downstream processing.
  */
@@ -79,3 +79,4 @@ function onMemoryBoardClick(event: MouseEvent): void {
 export function bindMemoryCardFlip(boardElement: HTMLElement): void {
   boardElement.addEventListener("click", onMemoryBoardClick);
 }
+

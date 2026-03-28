@@ -163,7 +163,7 @@ function getThemeCardCount(theme: GameSettings["theme"]): number {
 
 /**
  * Creates Card File Name from the provided inputs.
- * @param index Eingabewert, der in diesem Verarbeitungsschritt verwendet wird.
+ * @param index Input value used in this processing step.
  * @returns Generated string value for rendering or downstream processing.
  */
 function createCardFileName(index: number): string {
@@ -276,4 +276,5 @@ export function renderMemoryBoard(settings: GameSettings): MemoryCardData[] {
   clearPlayerStacks();
   return deck;
 }
+
 

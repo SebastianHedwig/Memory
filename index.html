@@ -1,22 +1,41 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en" translate="no" class="notranslate">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <meta name="google" content="notranslate">
+    <link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
     <title>Memory</title>
     <script type="module" src="./src/home.ts" defer></script>
 </head>
-<body class="home">
-    <div class="title-box">
-        <span class="subtitle"></span>
-        <h1 class="title"></h1>
-    </div>
-    <button class="button button--primary">
-        <img class="button__controller-icon" src="./src/assets/icons/controller.png" alt="controller icon">
-        <span id="play-btn">Play</span>
-        <img class="button__arrow-icon" src="./src/assets/icons/arrow-right.png" alt="arrow-right icon">
-    </button>
+<body class="home notranslate" translate="no">
+    <main class="home__main">
+        <div class="title-box">
+            <span class="subtitle"></span>
+            <h1 class="title"></h1>
+        </div>
+        <button class="button button--primary">
+            <img class="button__controller-icon" src="./src/assets/icons/controller.png" alt="controller icon">
+            <span id="play-btn">Play</span>
+            <img class="button__arrow-icon" src="./src/assets/icons/arrow-right.png" alt="arrow-right icon">
+        </button>
+    </main>
+
+    <footer class="home__footer" aria-label="Site footer">
+        <a class="home__footer-link" href="./legal-notice.html">Legal Notice</a>
+        <div class="home__footer-center">
+            <p class="home__footer-copy">&copy; Sebastian Hedwig</p>
+            <a
+                class="home__footer-assets-link"
+                href="https://developerakademie.com/?utm_term=developer%20academy&utm_campaign=S2%20Search%20Brand%20%232&utm_source=adwords&utm_medium=ppc&hsa_acc=3199679202&hsa_cam=20207938697&hsa_grp=159989510365&hsa_ad=697748504391&hsa_src=g&hsa_tgt=kwd-299379857420&hsa_kw=developer%20academy&hsa_mt=e&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=20207938697&gbraid=0AAAAADgFy8ND2ujDYrqdgosgz2iEfOisJ&gclid=CjwKCAjw-J3OBhBuEiwAwqZ_h9H1NrX1q8nPVX3YxHD0CmAsGS0JSs-46lhSbGoOKbzxk0HFOpJDIxoCbjQQAvD_BwE"
+                target="_blank"
+                rel="noopener noreferrer">
+                Used Assets from Developer Academy
+            </a>
+        </div>
+        <a class="home__footer-link home__footer-link--right" href="./privacy-policy.html">Privacy Policy</a>
+    </footer>
+
     <div class="controller-watermark" aria-hidden="true"></div>
 </body>
 </html>
