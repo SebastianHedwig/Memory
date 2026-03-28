@@ -27,6 +27,7 @@ $code-vibes-game-over-main-gap: clamp(2.35rem, 4.9vh, 3.5rem);
   --exit-action-line-height: 1;
   --exit-action-text-wrap: nowrap;
   --exit-action-transition: none;
+    background-color: rgba(48, 49, 49, 1);
 
   .game__player-info {
     display: flex;

@@ -118,8 +118,15 @@
 }
 
 .legal-notice__panel-body a {
-  color: rgba(77, 213, 188, 1);
+  color: rgba(255, 255, 255, 0.92);
   text-decoration: none;
+}
+
+.legal-notice__panel-body a:hover,
+.legal-notice__panel-body a:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: rgba(77, 213, 188, 1);
+  text-underline-offset: 0.12em;
 }
 
 .legal-notice .controller-watermark {

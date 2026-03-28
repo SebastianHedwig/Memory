@@ -133,8 +133,15 @@
 }
 
 .privacy-policy__panel-body a {
-  color: rgba(77, 213, 188, 1);
+  color: rgba(255, 255, 255, 0.92);
   text-decoration: none;
+}
+
+.privacy-policy__panel-body a:hover,
+.privacy-policy__panel-body a:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: rgba(77, 213, 188, 1);
+  text-underline-offset: 0.12em;
 }
 
 .privacy-policy .controller-watermark {
